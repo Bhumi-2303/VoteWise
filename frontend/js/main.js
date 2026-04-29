@@ -1,48 +1,98 @@
-// Main JavaScript file for handling UI interactions and API calls
+// Main JavaScript for VoteWise AI Landing Page
 
 document.addEventListener('DOMContentLoaded', () => {
+    // 1. Language Selector Toggle Logic
+    const langBtn = document.getElementById('lang-btn');
+    const langDropdown = document.getElementById('lang-dropdown');
+
+    if (langBtn && langDropdown) {
+        langBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            langDropdown.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => {
+            if (langDropdown.classList.contains('active')) {
+                langDropdown.classList.remove('active');
+            }
+        });
+
+        // Handle language selection (UI Update Only)
+        const langOptions = langDropdown.querySelectorAll('a');
+        langOptions.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                // Update button text to selected language flag & code
+                const text = e.target.textContent;
+                const flag = text.split(' ')[0];
+                const code = text.split(' ')[1].substring(0, 2).toUpperCase();
+                langBtn.innerHTML = `${flag} ${code} ▼`;
+                langDropdown.classList.remove('active');
+            });
+        });
+    }
+
+    // 2. Chat Interface Logic (Frontend Mockup)
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
 
-    // Handle sending a message
-    const sendMessage = async () => {
-        const text = userInput.value.trim();
-        if (!text) return;
-
-        // Display user message in UI
-        addMessage(text, 'user');
-        userInput.value = '';
-
-        try {
-            // TODO: Call the FastAPI backend endpoint here
-            // const response = await fetch('http://localhost:8000/api/chat', { ... });
+    if (chatBox && userInput && sendBtn) {
+        const addMessage = (text, sender) => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${sender}-message`;
             
-            // Placeholder response to show UI interactivity
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.textContent = sender === 'user' ? '👤' : '🤖';
+
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.textContent = text;
+
+            msgDiv.appendChild(avatar);
+            msgDiv.appendChild(bubble);
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        };
+
+        const sendMessage = () => {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // Add user message to UI
+            addMessage(text, 'user');
+            userInput.value = '';
+
+            // Simulate AI typing and responding (Frontend only for now)
             setTimeout(() => {
-                addMessage("This is a placeholder response from VoteWise AI. Connect backend to get real answers!", 'system');
-            }, 500);
+                addMessage("I am the VoteWise AI assistant. My backend is currently being connected, but soon I'll be able to provide detailed, unbiased answers regarding your local elections, voting rights, and more!", 'system');
+            }, 800);
+        };
 
-        } catch (error) {
-            console.error("Error communicating with backend:", error);
-            addMessage("Sorry, there was an error processing your request.", 'system');
-        }
-    };
+        sendBtn.addEventListener('click', sendMessage);
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    }
 
-    // Helper to add message to the chat interface
-    const addMessage = (text, sender) => {
-        const msgDiv = document.createElement('div');
-        msgDiv.className = `message ${sender}-message`;
-        msgDiv.textContent = text;
-        chatBox.appendChild(msgDiv);
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
-
-    // Event listeners
-    sendBtn.addEventListener('click', sendMessage);
-    userInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
+    // 3. Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const targetElement = document.querySelector(targetId);
+            if (targetElement) {
+                targetElement.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
     });
 });

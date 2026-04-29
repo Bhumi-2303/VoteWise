@@ -4,27 +4,156 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoteWise AI - Civic Education Assistant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    <header>
-        <h1>VoteWise AI</h1>
-        <p>Your AI-powered civic education assistant</p>
-    </header>
-    
-    <main>
-        <!-- Chat Interface Placeholder -->
-        <div id="chat-container">
-            <div id="chat-box">
-                <!-- Messages will appear here -->
-                <div class="message system-message">Welcome to VoteWise AI! How can I help you understand your civic duties today?</div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <span class="logo-icon">🗳️</span>
+            VoteWise AI
+        </div>
+        <div class="nav-links">
+            <a href="#features">Features</a>
+            <a href="#timeline">Timeline</a>
+            <a href="#accessibility">Accessibility</a>
+        </div>
+        <div class="nav-actions">
+            <!-- Language Selector UI -->
+            <div class="language-selector">
+                <button id="lang-btn">🇺🇸 EN ▼</button>
+                <div class="lang-dropdown" id="lang-dropdown">
+                    <a href="#">🇺🇸 English</a>
+                    <a href="#">🇪🇸 Español</a>
+                    <a href="#">🇫🇷 Français</a>
+                </div>
             </div>
-            <div class="input-area">
-                <input type="text" id="user-input" placeholder="Ask a question about voting, elections, etc...">
-                <button id="send-btn">Send</button>
+            <a href="#chat" class="btn btn-primary">Try AI Assistant</a>
+        </div>
+    </nav>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Empowering Voters with AI-Driven Clarity</h1>
+                <p>Your intelligent civic education assistant. Get unbiased, accurate information about elections, voting rights, and democratic processes in seconds.</p>
+                <div class="hero-actions">
+                    <a href="#chat" class="btn btn-primary btn-large">Start Chatting Now</a>
+                    <a href="#features" class="btn btn-secondary btn-large">Explore Features</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="floating-element ai-chat-mockup">
+                    <div class="mockup-header">VoteWise Assistant</div>
+                    <div class="mockup-body">
+                        <div class="mock-bubble ai">How can I help you vote today?</div>
+                        <div class="mock-bubble user">Where is my polling place?</div>
+                        <div class="mock-bubble ai typing">...</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <h2>Why Use VoteWise AI?</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="icon">💬</div>
+                    <h3>AI Assistant</h3>
+                    <p>Ask complex questions about your civic duties and get simple, easy-to-understand answers instantly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📅</div>
+                    <h3>Election Tracking</h3>
+                    <p>Stay updated with upcoming local, state, and federal elections tailored to your specific district.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🛡️</div>
+                    <h3>Unbiased Info</h3>
+                    <p>We provide verified, neutral information sourced from official government and non-partisan databases.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Election Timeline Preview Section -->
+        <section id="timeline" class="timeline-section">
+            <h2>Upcoming Election Timeline</h2>
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-date">Oct 15, 2026</div>
+                    <div class="timeline-content">
+                        <h4>Voter Registration Deadline</h4>
+                        <p>Last day to register to vote for the upcoming general election in most states.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Oct 20, 2026</div>
+                    <div class="timeline-content">
+                        <h4>Early Voting Begins</h4>
+                        <p>Polling places open for early in-person voting across participating districts.</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <div class="timeline-date">Nov 3, 2026</div>
+                    <div class="timeline-content">
+                        <h4>Election Day</h4>
+                        <p>Polls are open from 7:00 AM to 8:00 PM. Make your voice heard!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Accessibility Section -->
+        <section id="accessibility" class="accessibility">
+            <div class="acc-content">
+                <h2>Designed for Everyone</h2>
+                <p>VoteWise AI is built with accessibility at its core. We support screen readers, high-contrast modes, and offer multi-language support to ensure every citizen can access vital election information seamlessly.</p>
+                <ul class="acc-list">
+                    <li>✓ WCAG 2.1 AA Compliant</li>
+                    <li>✓ Screen Reader Optimized</li>
+                    <li>✓ Keyboard Navigable</li>
+                    <li>✓ Multi-language Support</li>
+                </ul>
+            </div>
+            <div class="acc-visual">
+                ♿
+            </div>
+        </section>
+
+        <!-- AI Assistant / Chat Preview Section -->
+        <section id="chat" class="chat-preview-section">
+            <h2>Meet Your AI Assistant</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Ask anything about the voting process.</p>
+            <div class="chat-container">
+                <div class="chat-box" id="chat-box">
+                    <div class="message system-message">
+                        <div class="avatar">🤖</div>
+                        <div class="bubble">Welcome to VoteWise AI! How can I help you understand your civic duties today?</div>
+                    </div>
+                </div>
+                <div class="input-area">
+                    <input type="text" id="user-input" placeholder="Ask about voting, elections, etc...">
+                    <button id="send-btn">Send</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">VoteWise AI</div>
+            <p>&copy; 2026 VoteWise AI. Empowering Democracy through Technology.</p>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Contact Support</a>
             </div>
         </div>
-    </main>
+    </footer>
 
     <script src="js/main.js"></script>
 </body>
