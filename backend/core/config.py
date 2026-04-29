@@ -1,20 +1,25 @@
-"""
-Configuration management.
-Loads environment variables and application settings.
-"""
 import os
+from typing import List
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 
-# Load variables from .env file
 load_dotenv()
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "VoteWise AI"
-    # Read the Gemini API Key from environment variables
-    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    VERSION: str = "1.0.0"
     
-    # Example additional settings
-    # DEBUG_MODE: bool = os.getenv("DEBUG_MODE", "False").lower() == "true"
+    # Environment
+    ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
+    DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
+    
+    # CORS setup (can be overridden in production)
+    CORS_ORIGINS: List[str] = ["*"]
+    
+    # API Keys
+    GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+
+    class Config:
+        case_sensitive = True
 
 settings = Settings()

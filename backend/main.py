@@ -1,29 +1,54 @@
-"""
-Main entry point for the FastAPI backend.
-Run using: uvicorn backend.main:app --reload
-"""
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import endpoints
+from fastapi.responses import JSONResponse
+import time
 
-app = FastAPI(
-    title="VoteWise AI API",
-    description="Backend API for the VoteWise AI civic education assistant",
-    version="0.1.0"
-)
+from backend.core.config import settings
+from backend.routes import health, chat
+from backend.core.exceptions import custom_exception_handler, CustomException
 
-# Configure CORS for frontend integration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Update this in production to restrict origins
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+def create_app() -> FastAPI:
+    """
+    Initialize and configure the FastAPI application.
+    """
+    app = FastAPI(
+        title=settings.PROJECT_NAME,
+        description="Backend API for the VoteWise AI civic education assistant",
+        version=settings.VERSION,
+    )
 
-# Include API routers
-app.include_router(endpoints.router, prefix="/api")
+    # Configure CORS
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.CORS_ORIGINS,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
-@app.get("/")
-async def root():
-    return {"message": "Welcome to the VoteWise AI API"}
+    # Global timing middleware
+    @app.middleware("http")
+    async def add_process_time_header(request: Request, call_next):
+        start_time = time.time()
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        response.headers["X-Process-Time"] = str(process_time)
+        return response
+
+    # Global Exception Handlers
+    app.add_exception_handler(CustomException, custom_exception_handler)
+    
+    @app.exception_handler(Exception)
+    async def global_exception_handler(request: Request, exc: Exception):
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "An unexpected error occurred. Please try again later."},
+        )
+
+    # Include Routers
+    app.include_router(health.router, prefix="/api/v1", tags=["Health"])
+    app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
+
+    return app
+
+app = create_app()
