@@ -7,6 +7,7 @@ router = APIRouter()
 
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, max_length=1000, description="The user's prompt")
+    language: str = Field(default="English", pattern="^(English|Hindi|Gujarati)$", description="The language the AI should respond in")
 
 class ChatResponse(BaseModel):
     reply: str
@@ -18,7 +19,7 @@ async def chat_endpoint(request: ChatRequest):
     Handle chat messages from the frontend, validate, and query the AI service.
     """
     try:
-        reply = await get_ai_response(request.message)
+        reply = await get_ai_response(request.message, request.language)
         return ChatResponse(reply=reply)
     except Exception as e:
         raise CustomException(

@@ -17,8 +17,15 @@ Please adhere to the following guidelines:
 5. If you do not know the answer with certainty, advise the user to consult official government resources (e.g., vote.gov).
 """
 
-def format_user_prompt(message: str) -> str:
+def format_user_prompt(message: str, language: str = "English") -> str:
     """
     Wraps the raw user message in a structured format before sending it to the model.
     """
-    return f"User Question: {message}\n\nPlease provide a helpful, unbiased response based on your system instructions."
+    base_prompt = f"User Question: {message}\n\nPlease provide a helpful, unbiased response based on your system instructions."
+    
+    if language.lower() != "english":
+        base_prompt += f"\n\nIMPORTANT: You must translate and provide your entire response in {language}. Ensure the tone is simple, natural, and preserves the beginner-friendly civic education focus. Do not include English text unless it is a specific proper noun or term that cannot be translated."
+    else:
+        base_prompt += "\n\nIMPORTANT: You must reply entirely in English."
+        
+    return base_prompt

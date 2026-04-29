@@ -1,5 +1,8 @@
 // Main JavaScript for VoteWise AI Landing Page
 
+// Add state for selected language
+window.currentLanguage = "English";
+
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Language Selector Toggle Logic
     const langBtn = document.getElementById('lang-btn');
@@ -18,15 +21,60 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Handle language selection (UI Update Only)
+        // Handle language selection
         const langOptions = langDropdown.querySelectorAll('a');
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
                 const text = e.target.textContent;
                 const flag = text.split(' ')[0];
-                const code = text.split(' ')[1].substring(0, 2).toUpperCase();
-                langBtn.innerHTML = `${flag} ${code} ▼`;
+                const langName = e.target.getAttribute('data-lang');
+                
+                if (window.currentLanguage !== langName) {
+                    window.currentLanguage = langName;
+                    const code = langName.substring(0, 2).toUpperCase();
+                    langBtn.innerHTML = `${flag} ${code} ▼`;
+                    
+                    // Update UI elements based on language
+                    const userInput = document.getElementById('user-input');
+                    const chatBox = document.getElementById('chat-box');
+                    
+                    let greeting = "Hello! How can I help you understand your civic duties today?";
+                    let placeholder = "Ask about voting, elections, etc...";
+                    
+                    if (langName === "Hindi") {
+                        greeting = "नमस्ते! आज मैं आपके नागरिक कर्तव्यों को समझने में आपकी कैसे मदद कर सकता हूँ?";
+                        placeholder = "मतदान, चुनाव आदि के बारे में पूछें...";
+                    } else if (langName === "Gujarati") {
+                        greeting = "નમસ્તે! આજે હું તમને તમારી નાગરિક ફરજો સમજવામાં કેવી રીતે મદદ કરી શકું?";
+                        placeholder = "મતદાન, ચૂંટણીઓ વગેરે વિશે પૂછો...";
+                    }
+                    
+                    if (userInput) userInput.placeholder = placeholder;
+                    
+                    if (chatBox) {
+                        const msgDiv = document.createElement('div');
+                        msgDiv.className = 'message system-message';
+                        
+                        const avatar = document.createElement('div');
+                        avatar.className = 'avatar';
+                        avatar.textContent = '🤖';
+
+                        const bubbleContainer = document.createElement('div');
+                        bubbleContainer.className = 'bubble-container';
+
+                        const bubble = document.createElement('div');
+                        bubble.className = 'bubble';
+                        bubble.innerHTML = greeting;
+
+                        bubbleContainer.appendChild(bubble);
+                        msgDiv.appendChild(avatar);
+                        msgDiv.appendChild(bubbleContainer);
+                        
+                        chatBox.appendChild(msgDiv);
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                    }
+                }
                 langDropdown.classList.remove('active');
             });
         });
@@ -212,7 +260,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message: apiMessage })
+                    body: JSON.stringify({ 
+                        message: apiMessage,
+                        language: window.currentLanguage
+                    })
                 });
 
                 removeLoadingIndicator();

@@ -15,7 +15,7 @@ if settings.GEMINI_API_KEY:
 else:
     app_logger.warning("GEMINI_API_KEY is not set in the environment.")
 
-async def get_ai_response(prompt: str) -> str:
+async def get_ai_response(prompt: str, language: str = "English") -> str:
     """
     Generate an AI response using the Gemini API with timeout and error handling.
     """
@@ -31,7 +31,7 @@ async def get_ai_response(prompt: str) -> str:
             system_instruction=get_system_prompt(),
         )
         
-        formatted_prompt = format_user_prompt(prompt)
+        formatted_prompt = format_user_prompt(prompt, language)
         app_logger.info("Sending formatted prompt to Gemini API.")
         
         # We enforce a timeout so the frontend doesn't hang indefinitely
