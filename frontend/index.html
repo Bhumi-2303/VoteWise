@@ -16,6 +16,7 @@
         </div>
         <div class="nav-links">
             <a href="#features">Features</a>
+            <a href="#election-flow">How it Works</a>
             <a href="#timeline">Timeline</a>
             <a href="#accessibility">Accessibility</a>
         </div>
@@ -74,6 +75,101 @@
                     <div class="icon">🛡️</div>
                     <h3>Unbiased Info</h3>
                     <p>We provide verified, neutral information sourced from official government and non-partisan databases.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Guided Election Flow Section -->
+        <section id="election-flow" class="election-flow-section">
+            <h2>The Election Process</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Understand the step-by-step journey of a democratic election.</p>
+            
+            <div class="flow-container">
+                <!-- Progress Bar -->
+                <div class="flow-progress">
+                    <div class="progress-bar" id="flow-progress-bar"></div>
+                    <div class="progress-steps">
+                        <div class="step-indicator active" data-step="1">1</div>
+                        <div class="step-indicator" data-step="2">2</div>
+                        <div class="step-indicator" data-step="3">3</div>
+                        <div class="step-indicator" data-step="4">4</div>
+                        <div class="step-indicator" data-step="5">5</div>
+                        <div class="step-indicator" data-step="6">6</div>
+                    </div>
+                </div>
+
+                <!-- Step Cards -->
+                <div class="step-cards" id="step-cards-container">
+                    <!-- Step 1 -->
+                    <div class="step-card active" data-step="1">
+                        <div class="step-icon">📝</div>
+                        <h3>1. Registration</h3>
+                        <p class="step-summary">Citizens must register to vote before the deadline.</p>
+                        <div class="step-details">
+                            <p>Voter registration is the first step in the democratic process. It ensures that only eligible citizens can cast a ballot. You must provide proof of residency and age. Deadlines vary by state, so always check early!</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step-card" data-step="2">
+                        <div class="step-icon">✅</div>
+                        <h3>2. Verification</h3>
+                        <p class="step-summary">Authorities verify the voter rolls and candidate eligibility.</p>
+                        <div class="step-details">
+                            <p>Election boards review the registered voters to prevent fraud. At the same time, candidates who filed to run are verified to ensure they meet the legal requirements for the office they seek.</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step-card" data-step="3">
+                        <div class="step-icon">📢</div>
+                        <h3>3. Campaigning</h3>
+                        <p class="step-summary">Candidates share their platforms and debate issues.</p>
+                        <div class="step-details">
+                            <p>During this phase, candidates hold rallies, participate in debates, and run advertisements to convince voters. It is the best time for voters to research platforms and make informed decisions.</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step-card" data-step="4">
+                        <div class="step-icon">🗳️</div>
+                        <h3>4. Voting</h3>
+                        <p class="step-summary">Citizens cast their ballots either early, by mail, or on Election Day.</p>
+                        <div class="step-details">
+                            <p>Voters head to the polls or mail in their ballots. Polling stations are strictly regulated to ensure privacy and security. Every single vote is safely stored until counting begins.</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="step-card" data-step="5">
+                        <div class="step-icon">📊</div>
+                        <h3>5. Counting</h3>
+                        <p class="step-summary">Votes are tallied securely by election officials.</p>
+                        <div class="step-details">
+                            <p>Once polls close, the counting process starts. Both electronic scanners and manual hand counts are used depending on the jurisdiction, often overseen by bipartisan observers to guarantee fairness.</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="step-card" data-step="6">
+                        <div class="step-icon">🎉</div>
+                        <h3>6. Results</h3>
+                        <p class="step-summary">Winners are certified and prepare to take office.</p>
+                        <div class="step-details">
+                            <p>Preliminary results are announced on election night, but official certification takes a few weeks to account for provisional and late-arriving mail ballots. Finally, the winners are sworn in!</p>
+                        </div>
+                        <button class="expand-btn">Read More ▼</button>
+                    </div>
+                </div>
+                
+                <div class="flow-controls">
+                    <button class="btn btn-secondary" id="prev-step-btn" disabled>← Previous Step</button>
+                    <button class="btn btn-primary" id="next-step-btn">Next Step →</button>
                 </div>
             </div>
         </section>

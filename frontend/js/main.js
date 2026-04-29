@@ -222,7 +222,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 3. Smooth scroll for anchor links
+    // 3. Guided Election Flow Logic
+    const steps = document.querySelectorAll('.step-card');
+    const indicators = document.querySelectorAll('.step-indicator');
+    const prevBtn = document.getElementById('prev-step-btn');
+    const nextBtn = document.getElementById('next-step-btn');
+    const progressBar = document.getElementById('flow-progress-bar');
+    
+    if (steps.length > 0 && indicators.length > 0) {
+        let currentStep = 1;
+        const totalSteps = steps.length;
+
+        const updateFlow = (stepNumber) => {
+            // Update cards
+            steps.forEach(card => {
+                if (parseInt(card.getAttribute('data-step')) === stepNumber) {
+                    card.classList.add('active');
+                } else {
+                    card.classList.remove('active');
+                }
+            });
+
+            // Update indicators
+            indicators.forEach(ind => {
+                const indStep = parseInt(ind.getAttribute('data-step'));
+                if (indStep === stepNumber) {
+                    ind.classList.add('active');
+                    ind.classList.remove('completed');
+                } else if (indStep < stepNumber) {
+                    ind.classList.add('completed');
+                    ind.classList.remove('active');
+                } else {
+                    ind.classList.remove('active', 'completed');
+                }
+            });
+
+            // Update progress bar width
+            const percentage = ((stepNumber - 1) / (totalSteps - 1)) * 100;
+            if (progressBar) {
+                progressBar.style.width = `${percentage}%`;
+            }
+
+            // Update buttons
+            if (prevBtn) prevBtn.disabled = stepNumber === 1;
+            if (nextBtn) nextBtn.disabled = stepNumber === totalSteps;
+        };
+
+        // Navigation button listeners
+        if (prevBtn && nextBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateFlow(currentStep);
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateFlow(currentStep);
+                }
+            });
+        }
+
+        // Indicator click listeners
+        indicators.forEach(ind => {
+            ind.addEventListener('click', () => {
+                currentStep = parseInt(ind.getAttribute('data-step'));
+                updateFlow(currentStep);
+            });
+        });
+
+        // Expandable details listeners
+        const expandBtns = document.querySelectorAll('.expand-btn');
+        expandBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const details = e.target.previousElementSibling;
+                details.classList.toggle('expanded');
+                if (details.classList.contains('expanded')) {
+                    e.target.innerHTML = 'Read Less ▲';
+                } else {
+                    e.target.innerHTML = 'Read More ▼';
+                }
+            });
+        });
+        
+        // Initialize
+        updateFlow(currentStep);
+    }
+
+    // 4. Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             e.preventDefault();
