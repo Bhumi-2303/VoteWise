@@ -21,6 +21,12 @@
             <a href="#accessibility">Accessibility</a>
         </div>
         <div class="nav-actions">
+            <!-- Accessibility Toggles -->
+            <div class="a11y-controls">
+                <button id="dark-mode-btn" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">🌙</button>
+                <button id="large-text-btn" title="Toggle Large Text" aria-label="Toggle Large Text">A+</button>
+                <button id="beginner-mode-btn" title="Toggle Beginner Mode" aria-label="Toggle Beginner Mode">🎓 Basic</button>
+            </div>
             <!-- Language Selector UI -->
             <div class="language-selector">
                 <button id="lang-btn">🇺🇸 EN ▼</button>
@@ -246,6 +252,7 @@
                     </div>
                 </div>
                 <div class="input-area">
+                    <button id="mic-btn" title="Voice Input" aria-label="Voice Input">🎤</button>
                     <input type="text" id="user-input" placeholder="Ask about voting, elections, etc...">
                     <button id="send-btn">Send</button>
                 </div>
@@ -266,6 +273,7 @@
         </div>
     </footer>
 
+    <script src="js/accessibility.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>

@@ -92,7 +92,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 2000);
                 };
                 
+                // Text to Speech Button
+                const speakBtn = document.createElement('button');
+                speakBtn.className = 'copy-btn speak-btn';
+                speakBtn.innerHTML = '🔊 Listen';
+                speakBtn.setAttribute('aria-label', 'Read response aloud');
+                speakBtn.onclick = () => {
+                    if (window.speechSynthesis) {
+                        window.speechSynthesis.cancel(); // Stop current speech
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        window.speechSynthesis.speak(utterance);
+                    } else {
+                        alert("Text-to-speech is not supported in your browser.");
+                    }
+                };
+                
                 actionsDiv.appendChild(copyBtn);
+                actionsDiv.appendChild(speakBtn);
                 bubbleContainer.appendChild(actionsDiv);
             }
 
@@ -152,8 +168,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     copyBtn.style.color = 'var(--text-muted)';
                 }, 2000);
             };
+
+            const speakBtn = document.createElement('button');
+            speakBtn.className = 'copy-btn speak-btn';
+            speakBtn.innerHTML = '🔊 Listen';
+            speakBtn.setAttribute('aria-label', 'Read response aloud');
+            speakBtn.onclick = () => {
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    window.speechSynthesis.speak(utterance);
+                }
+            };
             
             actionsDiv.appendChild(copyBtn);
+            actionsDiv.appendChild(speakBtn);
             bubbleContainer.appendChild(actionsDiv);
         };
 
@@ -171,13 +200,19 @@ document.addEventListener('DOMContentLoaded', () => {
             addLoadingIndicator();
 
             try {
+                let apiMessage = text;
+                // Append beginner mode instruction if active
+                if (window.isBeginnerMode) {
+                    apiMessage = text + " (Please explain this very simply, as if I am a beginner learning about elections for the first time. Keep it easy to understand.)";
+                }
+
                 // Connect to FastAPI Backend
                 const response = await fetch(API_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ message: text })
+                    body: JSON.stringify({ message: apiMessage })
                 });
 
                 removeLoadingIndicator();
