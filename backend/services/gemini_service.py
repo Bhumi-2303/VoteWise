@@ -7,7 +7,7 @@ from google.api_core.exceptions import GoogleAPIError
 
 from backend.core.config import settings
 from backend.utils.logger import app_logger
-from backend.utils.prompts import get_system_prompt, format_user_prompt
+from backend.prompts import build_system_instruction, build_user_prompt
 
 # Initialize the Gemini client safely
 if settings.GEMINI_API_KEY:
@@ -28,10 +28,10 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         # System instructions set the AI's persona
         model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
-            system_instruction=get_system_prompt(),
+            system_instruction=build_system_instruction(),
         )
         
-        formatted_prompt = format_user_prompt(prompt, language)
+        formatted_prompt = build_user_prompt(prompt, language)
         app_logger.info("Sending formatted prompt to Gemini API.")
         
         # We enforce a timeout so the frontend doesn't hang indefinitely
