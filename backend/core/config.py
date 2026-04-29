@@ -12,8 +12,8 @@ class Settings:
     ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
     DEBUG: bool = os.getenv("DEBUG", "True").lower() == "true"
     
-    # CORS setup (can be overridden in production)
-    CORS_ORIGINS: List[str] = ["*"]
+    # CORS setup
+    CORS_ORIGINS: List[str] = os.getenv("CORS_ORIGINS", "*").split(",")
     
     # API Keys
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")

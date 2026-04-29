@@ -86,7 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sendBtn = document.getElementById('send-btn');
     
     // API endpoint for FastAPI backend
-    const API_URL = 'http://localhost:8000/api/v1/chat/';
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const API_BASE_URL = isLocalhost ? 'http://localhost:8000' : 'https://votewise-backend.onrender.com';
+    const API_URL = `${API_BASE_URL}/api/v1/chat/`;
 
     if (chatBox && userInput && sendBtn) {
         
