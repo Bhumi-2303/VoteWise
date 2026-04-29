@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', () => {
         langOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
-                // Update button text to selected language flag & code
                 const text = e.target.textContent;
                 const flag = text.split(' ')[0];
                 const code = text.split(' ')[1].substring(0, 2).toUpperCase();
@@ -33,13 +32,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 2. Chat Interface Logic (Frontend Mockup)
+    // 2. Chat Interface Logic
     const chatBox = document.getElementById('chat-box');
     const userInput = document.getElementById('user-input');
     const sendBtn = document.getElementById('send-btn');
+    
+    // API endpoint for FastAPI backend
+    const API_URL = 'http://localhost:8000/api/v1/chat/';
 
     if (chatBox && userInput && sendBtn) {
-        const addMessage = (text, sender) => {
+        
+        // Helper to create basic message DOM structure
+        const createMessageElement = (sender) => {
             const msgDiv = document.createElement('div');
             msgDiv.className = `message ${sender}-message`;
             
@@ -47,37 +51,175 @@ document.addEventListener('DOMContentLoaded', () => {
             avatar.className = 'avatar';
             avatar.textContent = sender === 'user' ? '👤' : '🤖';
 
+            const bubbleContainer = document.createElement('div');
+            bubbleContainer.className = 'bubble-container';
+
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.textContent = text;
 
+            bubbleContainer.appendChild(bubble);
             msgDiv.appendChild(avatar);
-            msgDiv.appendChild(bubble);
+            msgDiv.appendChild(bubbleContainer);
+            
+            return { msgDiv, bubble, bubbleContainer };
+        };
 
+        // Add a message directly to chat
+        const addMessage = (text, sender) => {
+            const { msgDiv, bubble, bubbleContainer } = createMessageElement(sender);
+            
+            // Basic markdown formatting for bold and newlines
+            let formattedText = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            bubble.innerHTML = formattedText;
+
+            // Add Copy Button for AI responses
+            if (sender === 'system') {
+                const actionsDiv = document.createElement('div');
+                actionsDiv.className = 'message-actions';
+                
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.innerHTML = '📋 Copy Response';
+                
+                // Copy raw text (not HTML)
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(text);
+                    copyBtn.innerHTML = '✅ Copied!';
+                    copyBtn.style.color = 'var(--primary)';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '📋 Copy Response';
+                        copyBtn.style.color = 'var(--text-muted)';
+                    }, 2000);
+                };
+                
+                actionsDiv.appendChild(copyBtn);
+                bubbleContainer.appendChild(actionsDiv);
+            }
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            return msgDiv;
+        };
+
+        // Loading animation logic
+        const addLoadingIndicator = () => {
+            const { msgDiv, bubble } = createMessageElement('system');
+            bubble.innerHTML = '<div class="typing-indicator"><span></span><span></span><span></span></div>';
+            msgDiv.id = 'loading-indicator';
             chatBox.appendChild(msgDiv);
             chatBox.scrollTop = chatBox.scrollHeight;
         };
 
-        const sendMessage = () => {
+        const removeLoadingIndicator = () => {
+            const indicator = document.getElementById('loading-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        };
+
+        // Simulates a smooth fade-in typing effect
+        const typeEffect = (element, text, bubbleContainer) => {
+            element.innerHTML = '';
+            
+            // Temporary div to parse markdown correctly before displaying
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            
+            element.innerHTML = tempDiv.innerHTML;
+            element.style.opacity = '0';
+            
+            let opacity = 0;
+            const fadeIn = setInterval(() => {
+                opacity += 0.1;
+                element.style.opacity = opacity.toString();
+                chatBox.scrollTop = chatBox.scrollHeight;
+                if (opacity >= 1) clearInterval(fadeIn);
+            }, 30);
+            
+            // Append copy button after text is injected
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'message-actions';
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.innerHTML = '📋 Copy Response';
+            
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(text);
+                copyBtn.innerHTML = '✅ Copied!';
+                copyBtn.style.color = 'var(--primary)';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '📋 Copy Response';
+                    copyBtn.style.color = 'var(--text-muted)';
+                }, 2000);
+            };
+            
+            actionsDiv.appendChild(copyBtn);
+            bubbleContainer.appendChild(actionsDiv);
+        };
+
+        // Core Send Message Logic
+        const sendMessage = async () => {
             const text = userInput.value.trim();
             if (!text) return;
 
-            // Add user message to UI
+            // Display user's query
             addMessage(text, 'user');
             userInput.value = '';
+            sendBtn.disabled = true;
 
-            // Simulate AI typing and responding (Frontend only for now)
-            setTimeout(() => {
-                addMessage("I am the VoteWise AI assistant. My backend is currently being connected, but soon I'll be able to provide detailed, unbiased answers regarding your local elections, voting rights, and more!", 'system');
-            }, 800);
+            // Show loading dots
+            addLoadingIndicator();
+
+            try {
+                // Connect to FastAPI Backend
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: text })
+                });
+
+                removeLoadingIndicator();
+
+                if (!response.ok) {
+                    throw new Error(`Server Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // Render AI response with typing effect
+                const { msgDiv, bubble, bubbleContainer } = createMessageElement('system');
+                chatBox.appendChild(msgDiv);
+                typeEffect(bubble, data.reply, bubbleContainer);
+
+            } catch (error) {
+                console.error("Error communicating with backend:", error);
+                removeLoadingIndicator();
+                addMessage("⚠️ I'm currently having trouble connecting to my servers. Please make sure the backend is running and try again.", 'system');
+            } finally {
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
         };
 
+        // Event Listeners
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !sendBtn.disabled) {
                 sendMessage();
             }
         });
+        
+        // Let's modify the initial welcome message to use the bubbleContainer correctly
+        const existingWelcome = document.querySelector('.system-message');
+        if (existingWelcome) {
+            const bubble = existingWelcome.querySelector('.bubble');
+            const newContainer = document.createElement('div');
+            newContainer.className = 'bubble-container';
+            existingWelcome.insertBefore(newContainer, bubble);
+            newContainer.appendChild(bubble);
+        }
     }
 
     // 3. Smooth scroll for anchor links
