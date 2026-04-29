@@ -269,6 +269,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 removeLoadingIndicator();
 
                 if (!response.ok) {
+                    if (response.status === 422) {
+                        throw new Error("Validation_Error");
+                    } else if (response.status === 408 || response.status === 504) {
+                        throw new Error("Timeout_Error");
+                    }
                     throw new Error(`Server Error: ${response.status}`);
                 }
 
@@ -282,7 +287,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 console.error("Error communicating with backend:", error);
                 removeLoadingIndicator();
-                addMessage("⚠️ I'm currently having trouble connecting to my servers. Please make sure the backend is running and try again.", 'system');
+                
+                let fallbackMessage = "⚠️ I'm currently having trouble connecting to my servers. Please check your network and try again.";
+                if (error.message === "Validation_Error") {
+                    fallbackMessage = "⚠️ Your message was either too long or invalid. Please try a shorter, clearer question.";
+                } else if (error.message === "Timeout_Error") {
+                    fallbackMessage = "⚠️ The request took too long to process. Please try asking again.";
+                }
+                
+                addMessage(fallbackMessage, 'system');
             } finally {
                 sendBtn.disabled = false;
                 userInput.focus();

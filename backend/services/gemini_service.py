@@ -15,6 +15,8 @@ if settings.GEMINI_API_KEY:
 else:
     app_logger.warning("GEMINI_API_KEY is not set in the environment.")
 
+from google.generativeai.types import HarmCategory, HarmBlockThreshold
+
 async def get_ai_response(prompt: str, language: str = "English") -> str:
     """
     Generate an AI response using the Gemini API with timeout and error handling.
@@ -34,9 +36,20 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         formatted_prompt = build_user_prompt(prompt, language)
         app_logger.info("Sending formatted prompt to Gemini API.")
         
+        # Configure safety settings to block harmful/biased content
+        safety_settings = {
+            HarmCategory.HARM_CATEGORY_HARASSMENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            HarmCategory.HARM_CATEGORY_HATE_SPEECH: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+            HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE,
+        }
+        
         # We enforce a timeout so the frontend doesn't hang indefinitely
         response = await asyncio.wait_for(
-            model.generate_content_async(formatted_prompt),
+            model.generate_content_async(
+                formatted_prompt,
+                safety_settings=safety_settings
+            ),
             timeout=15.0  # 15 seconds max execution time
         )
         
