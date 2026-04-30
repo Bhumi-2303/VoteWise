@@ -45,6 +45,11 @@ def create_app() -> FastAPI:
             content={"detail": "An unexpected error occurred. Please try again later."},
         )
 
+    # Root Endpoint
+    @app.get("/", tags=["Root"])
+    async def home():
+        return {"message": "Backend is running successfully"}
+
     # Include Routers
     app.include_router(health.router, prefix="/api/v1", tags=["Health"])
     app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
