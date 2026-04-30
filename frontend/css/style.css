@@ -883,55 +883,205 @@ footer {
 
 /* Accessibility Features */
 body.dark-mode {
-    --primary: #93c5fd;
-    --primary-dark: #60a5fa;
-    --primary-light: #1e3a8a;
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --primary-light: rgba(59, 130, 246, 0.15);
     --secondary: #38bdf8;
-    --background: #0f172a;
-    --surface: #1e293b;
-    --text-main: #ffffff;
-    --text-muted: #cbd5e1;
-    --border: #334155;
+    --background: #0b1121;
+    --surface: rgba(17, 24, 39, 0.82);
+    --text-main: #FFFFFF;
+    --text-muted: rgba(255, 255, 255, 0.78);
+    --border: rgba(59, 130, 246, 0.18);
+    background: radial-gradient(circle at 50% 0%, #1e3a8a 0%, #0b1121 50%);
+    background-attachment: fixed;
+}
+
+body.dark-mode .hero {
+    background: transparent;
 }
 
 body.dark-mode .navbar {
-    background-color: rgba(15, 23, 42, 0.85);
-    border-bottom: 1px solid rgba(51, 65, 85, 0.8);
+    background-color: rgba(11, 17, 33, 0.7);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .nav-actions button, body.dark-mode .nav-links a, body.dark-mode #lang-btn {
-    color: var(--text-main);
+    color: rgba(255, 255, 255, 0.85);
+    transition: all 0.3s ease;
 }
 
-body.dark-mode .lang-dropdown {
-    background-color: var(--surface);
-    border-color: var(--border);
+body.dark-mode .nav-links a:hover, body.dark-mode #lang-btn:hover {
+    color: #FFFFFF;
+    text-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
 }
 
-body.dark-mode .lang-dropdown a:hover {
-    background-color: var(--primary-light);
-    color: var(--text-main);
+body.dark-mode .feature-card, body.dark-mode .timeline-content, body.dark-mode .step-details {
+    background-color: rgba(17, 24, 39, 0.82);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    color: rgba(255, 255, 255, 0.75);
 }
 
-body.dark-mode ::placeholder {
-    color: #94a3b8;
-    opacity: 1;
+body.dark-mode .feature-card h3, body.dark-mode .timeline-date, body.dark-mode .timeline-content h4 {
+    color: #FFFFFF;
 }
 
-body.dark-mode .btn-secondary {
-    background-color: var(--surface);
-    color: var(--primary);
-    border-color: var(--primary);
+body.dark-mode .feature-card:hover {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
 }
 
-body.dark-mode .btn-secondary:hover {
-    background-color: var(--primary-light);
-    color: var(--text-main);
+body.dark-mode .chat-container {
+    background-color: #101827;
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(59, 130, 246, 0.1);
+}
+
+body.dark-mode .chat-box, body.dark-mode .input-area {
+    background-color: transparent;
+    border-color: rgba(59, 130, 246, 0.18);
+}
+
+body.dark-mode .bubble {
+    background-color: rgba(17, 24, 39, 0.9);
+    color: #F8FAFC;
+    border: 1px solid rgba(59, 130, 246, 0.2);
 }
 
 body.dark-mode .user-message .bubble, body.dark-mode .mock-bubble.user {
-    color: #0f172a;
-    font-weight: 600;
+    background-color: #2563eb;
+    color: #FFFFFF;
+    border: none;
+    font-weight: 500;
+}
+
+body.dark-mode #user-input {
+    background-color: rgba(17, 24, 39, 0.8);
+    color: #FFFFFF;
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+body.dark-mode #user-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+}
+
+body.dark-mode ::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 1;
+}
+
+body.dark-mode .lang-dropdown {
+    background-color: #111827;
+    border-color: rgba(59, 130, 246, 0.18);
+}
+
+body.dark-mode .lang-dropdown a:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #FFFFFF;
+}
+
+body.dark-mode .btn-secondary {
+    background-color: rgba(17, 24, 39, 0.82);
+    color: #3b82f6;
+    border-color: #3b82f6;
+}
+
+body.dark-mode .btn-secondary:hover {
+    background-color: rgba(59, 130, 246, 0.15);
+    color: #FFFFFF;
+}
+
+body.dark-mode .flow-container {
+    background-color: rgba(17, 24, 39, 0.82);
+    border: 1px solid rgba(59, 130, 246, 0.18);
+    backdrop-filter: blur(12px);
+}
+
+body.dark-mode .step-indicator {
+    background-color: #111827;
+    border-color: rgba(59, 130, 246, 0.18);
+}
+
+/* ---- Hero Section ---- */
+body.dark-mode .hero-content h1 {
+    color: #FFFFFF;
+    text-shadow: 0 0 40px rgba(59, 130, 246, 0.25);
+}
+
+body.dark-mode .hero-content p {
+    color: rgba(255, 255, 255, 0.78);
+}
+
+/* ---- Section backgrounds ---- */
+body.dark-mode .features,
+body.dark-mode .chat-preview-section,
+body.dark-mode .election-flow-section {
+    background-color: transparent;
+}
+
+body.dark-mode .timeline-section {
+    background: linear-gradient(180deg, rgba(17, 24, 39, 0.5) 0%, transparent 100%);
+}
+
+/* ---- Accessibility Section ---- */
+body.dark-mode .accessibility {
+    background-color: rgba(17, 24, 39, 0.9);
+    border-top: 1px solid rgba(59, 130, 246, 0.18);
+    border-bottom: 1px solid rgba(59, 130, 246, 0.18);
+}
+
+/* ---- a11y controls ---- */
+body.dark-mode .a11y-controls button {
+    border-color: rgba(59, 130, 246, 0.3);
+    color: rgba(255, 255, 255, 0.85);
+}
+
+body.dark-mode .a11y-controls button:hover,
+body.dark-mode .a11y-controls button.active {
+    background: rgba(59, 130, 246, 0.2);
+    color: #FFFFFF;
+    border-color: #3b82f6;
+}
+
+/* ---- Copy button ---- */
+body.dark-mode .copy-btn {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+body.dark-mode .copy-btn:hover {
+    color: #93c5fd;
+}
+
+/* ---- Footer ---- */
+body.dark-mode footer {
+    background-color: #060d1f;
+    border-top: 1px solid rgba(59, 130, 246, 0.15);
+}
+
+/* ---- Timeline dot ---- */
+body.dark-mode .interactive-timeline .timeline-item::after {
+    background: #3b82f6;
+    border-color: #0b1121;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* ---- AI chat mockup in hero ---- */
+body.dark-mode .ai-chat-mockup {
+    background: rgba(17, 24, 39, 0.9);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+}
+
+body.dark-mode .mockup-body {
+    background: rgba(11, 17, 33, 0.8);
+}
+
+body.dark-mode .mock-bubble.ai {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(59, 130, 246, 0.2);
+    color: #F8FAFC;
 }
 
 body.large-text {
