@@ -21,6 +21,12 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
+      - '--set-env-vars'
+      - 'ENVIRONMENT=production,DEBUG=False'
+      - '--set-secrets'
+      - 'GEMINI_API_KEY=gemini-api-key:latest'
 
   # 4. Build the Frontend Docker Image
   - name: 'gcr.io/cloud-builders/docker'
@@ -44,3 +50,5 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--port'
+      - '8080'
