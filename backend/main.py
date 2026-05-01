@@ -2,6 +2,12 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 import time
+import sys
+import os
+import uvicorn
+
+# Ensure the root directory is in the Python path so absolute imports work
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.core.config import settings
 from backend.routes import health, chat
@@ -47,7 +53,7 @@ def create_app() -> FastAPI:
 
     # Root Endpoint
     @app.get("/", tags=["Root"])
-    async def home():
+    def home():
         return {"message": "Backend is running successfully"}
 
     # Include Routers
@@ -57,3 +63,7 @@ def create_app() -> FastAPI:
     return app
 
 app = create_app()
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port)

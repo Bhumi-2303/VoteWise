@@ -8,3 +8,4 @@ python-multipart
 httpx
 jinja2
 pydantic-settings
+gunicorn
