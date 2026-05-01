@@ -11,7 +11,7 @@ from backend.utils.logger import app_logger
 from backend.prompts import build_system_instruction, build_user_prompt
 
 # The supported model to use for chat responses
-GEMINI_MODEL = "gemini-2.0-flash"
+GEMINI_MODEL = "gemini-1.5-flash-latest"
 
 # Lazily initialised client — created once when the first request arrives
 _client: genai.Client | None = None
@@ -78,7 +78,7 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         return "⏱️ The request took too long to process. Please try again."
 
     except genai_errors.ClientError as e:
-        status = getattr(e, "status_code", None)
+        status = getattr(e, "status_code", getattr(e, "code", None))
         app_logger.error(f"Gemini ClientError [{status}]: {str(e)}")
 
         if status == 429:
@@ -89,13 +89,12 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         if status in (401, 403):
             return (
                 "⚠️ API authentication failed. Please verify your Gemini API key "
-                "in the .env file."
+                "in the .env file or Secret Manager."
             )
         return (
-            "⚠️ I'm experiencing technical difficulties connecting to my knowledge "
-            "base. Please try again shortly."
+            f"⚠️ Technical difficulties connecting to the knowledge base. Details: [{status}] {str(e)}"
         )
 
     except Exception as e:
         app_logger.exception(f"Unexpected error in Gemini service: {type(e).__name__}: {str(e)}")
-        return "⚠️ An unexpected error occurred while processing your request."
+        return f"⚠️ An unexpected error occurred: {type(e).__name__}: {str(e)}"
