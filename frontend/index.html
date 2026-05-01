@@ -1,279 +1,165 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VoteWise AI - Civic Education Assistant</title>
+    <title>VoteWise AI - Premium Civic Education</title>
+    <meta name="description" content="Your intelligent civic education assistant. Get unbiased, accurate information about elections.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <div id="noise-overlay"></div>
     <!-- Navigation Bar -->
-    <nav class="navbar">
+    <nav class="navbar glass" id="navbar">
         <div class="logo">
             <span class="logo-icon">🗳️</span>
-            VoteWise AI
+            <span>VoteWise<span class="text-primary">AI</span></span>
         </div>
-        <div class="nav-links">
+        <div class="nav-links desktop-only">
             <a href="#features">Features</a>
             <a href="#election-flow">How it Works</a>
             <a href="#timeline">Timeline</a>
-            <a href="#accessibility">Accessibility</a>
         </div>
-        <div class="nav-actions">
-            <!-- Accessibility Toggles -->
+        <div class="nav-actions desktop-only">
             <div class="a11y-controls">
-                <button id="dark-mode-btn" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">🌙</button>
-                <button id="large-text-btn" title="Toggle Large Text" aria-label="Toggle Large Text">A+</button>
-                <button id="beginner-mode-btn" title="Toggle Beginner Mode" aria-label="Toggle Beginner Mode">🎓 Basic</button>
+                <button class="icon-btn" id="dark-mode-btn" title="Toggle Dark Mode">🌙</button>
             </div>
-            <!-- Language Selector UI -->
             <div class="language-selector">
-                <button id="lang-btn">🇺🇸 EN ▼</button>
-                <div class="lang-dropdown" id="lang-dropdown">
+                <button id="lang-btn" class="glass-btn">🇺🇸 EN ▼</button>
+                <div class="lang-dropdown glass" id="lang-dropdown">
                     <a href="#" data-lang="English">🇺🇸 English</a>
                     <a href="#" data-lang="Hindi">🇮🇳 Hindi</a>
                     <a href="#" data-lang="Gujarati">🇮🇳 Gujarati</a>
                 </div>
             </div>
-            <a href="#chat" class="btn btn-primary">Try AI Assistant</a>
         </div>
+        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
     </nav>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu glass" id="mobile-menu">
+        <a href="#features" class="mobile-link">Features</a>
+        <a href="#election-flow" class="mobile-link">How it Works</a>
+        <a href="#timeline" class="mobile-link">Timeline</a>
+        <div class="mobile-actions">
+            <button class="glass-btn" id="mobile-dark-mode-btn">Toggle Dark Mode</button>
+        </div>
+    </div>
 
     <main>
         <!-- Hero Section -->
         <section class="hero">
-            <div class="hero-content">
-                <h1>Empowering Voters with AI-Driven Clarity</h1>
-                <p>Your intelligent civic education assistant. Get unbiased, accurate information about elections, voting rights, and democratic processes in seconds.</p>
+            <div class="hero-bg-glow"></div>
+            <div class="hero-content fade-in-up">
+                <div class="badge glass">✨ AI-Powered Civic Platform</div>
+                <h1 class="gradient-text">Empowering Voters with Unbiased Clarity</h1>
+                <p class="hero-subtitle">Your intelligent civic education assistant. Get accurate information about elections, voting rights, and democratic processes instantly.</p>
                 <div class="hero-actions">
-                    <a href="#chat" class="btn btn-primary btn-large">Start Chatting Now</a>
-                    <a href="#features" class="btn btn-secondary btn-large">Explore Features</a>
-                </div>
-            </div>
-            <div class="hero-visual">
-                <div class="floating-element ai-chat-mockup">
-                    <div class="mockup-header">VoteWise Assistant</div>
-                    <div class="mockup-body">
-                        <div class="mock-bubble ai">How can I help you vote today?</div>
-                        <div class="mock-bubble user">Where is my polling place?</div>
-                        <div class="mock-bubble ai typing">...</div>
-                    </div>
+                    <button id="hero-chat-btn" class="btn btn-primary btn-glow">Ask the AI Assistant <span>→</span></button>
+                    <a href="#features" class="btn btn-secondary glass-btn">Explore Features</a>
                 </div>
             </div>
         </section>
 
-        <!-- Features Section -->
-        <section id="features" class="features">
-            <h2>Why Use VoteWise AI?</h2>
-            <div class="feature-grid">
-                <div class="feature-card">
-                    <div class="icon">💬</div>
-                    <h3>AI Assistant</h3>
-                    <p>Ask complex questions about your civic duties and get simple, easy-to-understand answers instantly.</p>
+        <!-- Bento Box Features Section -->
+        <section id="features" class="section">
+            <div class="section-header fade-in-up">
+                <h2>Why Choose VoteWise?</h2>
+                <p>Designed for speed, accuracy, and accessibility.</p>
+            </div>
+            <div class="bento-grid">
+                <div class="bento-card glass hover-lift reveal">
+                    <div class="icon-wrap gradient-bg">💬</div>
+                    <h3>Intelligent AI Chat</h3>
+                    <p>Ask complex questions and get simple, verified answers powered by Google Gemini.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="icon">📅</div>
+                <div class="bento-card glass hover-lift reveal span-2">
+                    <div class="icon-wrap gradient-bg">📅</div>
                     <h3>Election Tracking</h3>
-                    <p>Stay updated with upcoming local, state, and federal elections tailored to your specific district.</p>
+                    <p>Stay updated with upcoming local, state, and federal elections tailored to your specific district, ensuring you never miss a deadline.</p>
                 </div>
-                <div class="feature-card">
-                    <div class="icon">🛡️</div>
-                    <h3>Unbiased Info</h3>
-                    <p>We provide verified, neutral information sourced from official government and non-partisan databases.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Guided Election Flow Section -->
-        <section id="election-flow" class="election-flow-section">
-            <h2>The Election Process</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">Understand the step-by-step journey of a democratic election.</p>
-            
-            <div class="flow-container">
-                <!-- Progress Bar -->
-                <div class="flow-progress">
-                    <div class="progress-bar" id="flow-progress-bar"></div>
-                    <div class="progress-steps">
-                        <div class="step-indicator active" data-step="1">1</div>
-                        <div class="step-indicator" data-step="2">2</div>
-                        <div class="step-indicator" data-step="3">3</div>
-                        <div class="step-indicator" data-step="4">4</div>
-                        <div class="step-indicator" data-step="5">5</div>
-                        <div class="step-indicator" data-step="6">6</div>
-                    </div>
-                </div>
-
-                <!-- Step Cards -->
-                <div class="step-cards" id="step-cards-container">
-                    <!-- Step 1 -->
-                    <div class="step-card active" data-step="1">
-                        <div class="step-icon">📝</div>
-                        <h3>1. Registration</h3>
-                        <p class="step-summary">Citizens must register to vote before the deadline.</p>
-                        <div class="step-details">
-                            <p>Voter registration is the first step in the democratic process. It ensures that only eligible citizens can cast a ballot. You must provide proof of residency and age. Deadlines vary by state, so always check early!</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-
-                    <!-- Step 2 -->
-                    <div class="step-card" data-step="2">
-                        <div class="step-icon">✅</div>
-                        <h3>2. Verification</h3>
-                        <p class="step-summary">Authorities verify the voter rolls and candidate eligibility.</p>
-                        <div class="step-details">
-                            <p>Election boards review the registered voters to prevent fraud. At the same time, candidates who filed to run are verified to ensure they meet the legal requirements for the office they seek.</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-
-                    <!-- Step 3 -->
-                    <div class="step-card" data-step="3">
-                        <div class="step-icon">📢</div>
-                        <h3>3. Campaigning</h3>
-                        <p class="step-summary">Candidates share their platforms and debate issues.</p>
-                        <div class="step-details">
-                            <p>During this phase, candidates hold rallies, participate in debates, and run advertisements to convince voters. It is the best time for voters to research platforms and make informed decisions.</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-
-                    <!-- Step 4 -->
-                    <div class="step-card" data-step="4">
-                        <div class="step-icon">🗳️</div>
-                        <h3>4. Voting</h3>
-                        <p class="step-summary">Citizens cast their ballots either early, by mail, or on Election Day.</p>
-                        <div class="step-details">
-                            <p>Voters head to the polls or mail in their ballots. Polling stations are strictly regulated to ensure privacy and security. Every single vote is safely stored until counting begins.</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-
-                    <!-- Step 5 -->
-                    <div class="step-card" data-step="5">
-                        <div class="step-icon">📊</div>
-                        <h3>5. Counting</h3>
-                        <p class="step-summary">Votes are tallied securely by election officials.</p>
-                        <div class="step-details">
-                            <p>Once polls close, the counting process starts. Both electronic scanners and manual hand counts are used depending on the jurisdiction, often overseen by bipartisan observers to guarantee fairness.</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-
-                    <!-- Step 6 -->
-                    <div class="step-card" data-step="6">
-                        <div class="step-icon">🎉</div>
-                        <h3>6. Results</h3>
-                        <p class="step-summary">Winners are certified and prepare to take office.</p>
-                        <div class="step-details">
-                            <p>Preliminary results are announced on election night, but official certification takes a few weeks to account for provisional and late-arriving mail ballots. Finally, the winners are sworn in!</p>
-                        </div>
-                        <button class="expand-btn">Read More ▼</button>
-                    </div>
-                </div>
-                
-                <div class="flow-controls">
-                    <button class="btn btn-secondary" id="prev-step-btn" disabled>← Previous Step</button>
-                    <button class="btn btn-primary" id="next-step-btn">Next Step →</button>
+                <div class="bento-card glass hover-lift reveal">
+                    <div class="icon-wrap gradient-bg">🛡️</div>
+                    <h3>Unbiased & Secure</h3>
+                    <p>Verified, neutral information sourced from official government databases.</p>
                 </div>
             </div>
         </section>
 
-        <!-- Election Timeline Visualization Section -->
-        <section id="timeline" class="timeline-section">
-            <h2>General Election Timeline</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 3rem;">A standard visual timeline of the election cycle.</p>
+        <!-- Timeline Section -->
+        <section id="timeline" class="section timeline-section relative">
+            <div class="section-header reveal">
+                <h2>The Democratic Timeline</h2>
+                <p>Understand the standard election cycle.</p>
+            </div>
             <div class="timeline interactive-timeline">
                 <div class="timeline-item reveal">
-                    <div class="timeline-date">Stage 1</div>
-                    <div class="timeline-content">
-                        <h4>Nomination</h4>
-                        <p>Candidates officially declare their intention to run and gather the necessary signatures or party endorsements.</p>
+                    <div class="timeline-dot gradient-bg"></div>
+                    <div class="timeline-content glass hover-lift">
+                        <span class="timeline-date">Stage 1</span>
+                        <h4>Voter Registration</h4>
+                        <p>Ensure you are eligible and registered before the cutoff date.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
-                    <div class="timeline-date">Stage 2</div>
-                    <div class="timeline-content">
-                        <h4>Campaigning</h4>
-                        <p>Candidates actively engage with voters, host debates, and broadcast advertisements to share their vision.</p>
+                    <div class="timeline-dot gradient-bg"></div>
+                    <div class="timeline-content glass hover-lift">
+                        <span class="timeline-date">Stage 2</span>
+                        <h4>Campaigning & Debates</h4>
+                        <p>Learn about the candidates, their platforms, and their debate performances.</p>
                     </div>
                 </div>
                 <div class="timeline-item reveal">
-                    <div class="timeline-date">Stage 3</div>
-                    <div class="timeline-content">
-                        <h4>Voting Day</h4>
-                        <p>Citizens cast their ballots at polling stations. Early voting and mail-in ballots are also collected.</p>
+                    <div class="timeline-dot gradient-bg"></div>
+                    <div class="timeline-content glass hover-lift">
+                        <span class="timeline-date">Stage 3</span>
+                        <h4>Election Day</h4>
+                        <p>Cast your ballot securely at your designated polling location.</p>
                     </div>
-                </div>
-                <div class="timeline-item reveal">
-                    <div class="timeline-date">Stage 4</div>
-                    <div class="timeline-content">
-                        <h4>Counting</h4>
-                        <p>Polls close and election officials securely tally the votes using electronic and manual systems.</p>
-                    </div>
-                </div>
-                <div class="timeline-item reveal">
-                    <div class="timeline-date">Stage 5</div>
-                    <div class="timeline-content">
-                        <h4>Results & Certification</h4>
-                        <p>Winners are projected, margins are verified, and the final results are officially certified.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Accessibility Section -->
-        <section id="accessibility" class="accessibility">
-            <div class="acc-content">
-                <h2>Designed for Everyone</h2>
-                <p>VoteWise AI is built with accessibility at its core. We support screen readers, high-contrast modes, and offer multi-language support to ensure every citizen can access vital election information seamlessly.</p>
-                <ul class="acc-list">
-                    <li>✓ WCAG 2.1 AA Compliant</li>
-                    <li>✓ Screen Reader Optimized</li>
-                    <li>✓ Keyboard Navigable</li>
-                    <li>✓ Multi-language Support</li>
-                </ul>
-            </div>
-            <div class="acc-visual">
-                ♿
-            </div>
-        </section>
-
-        <!-- AI Assistant / Chat Preview Section -->
-        <section id="chat" class="chat-preview-section">
-            <h2>Meet Your AI Assistant</h2>
-            <p style="text-align: center; color: var(--text-muted); margin-bottom: 2rem;">Ask anything about the voting process.</p>
-            <div class="chat-container">
-                <div class="chat-box" id="chat-box">
-                    <div class="message system-message">
-                        <div class="avatar">🤖</div>
-                        <div class="bubble">Welcome to VoteWise AI! How can I help you understand your civic duties today?</div>
-                    </div>
-                </div>
-                <div class="input-area">
-                    <button id="mic-btn" title="Voice Input" aria-label="Voice Input">🎤</button>
-                    <input type="text" id="user-input" placeholder="Ask about voting, elections, etc...">
-                    <button id="send-btn">Send</button>
                 </div>
             </div>
         </section>
     </main>
 
-    <!-- Footer -->
-    <footer>
-        <div class="footer-content">
-            <div class="footer-logo">VoteWise AI</div>
-            <p>&copy; 2026 VoteWise AI. Empowering Democracy through Technology.</p>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Contact Support</a>
+    <!-- Floating Chat Panel -->
+    <div class="chat-fab-container">
+        <button class="chat-fab btn-glow" id="chat-fab">💬</button>
+    </div>
+
+    <div class="chat-panel glass" id="chat-panel">
+        <div class="chat-header gradient-bg">
+            <div class="chat-title">
+                <span class="avatar-small">🤖</span>
+                <div>
+                    <h3>VoteWise AI</h3>
+                    <span class="status-indicator"></span><small>Online</small>
+                </div>
             </div>
+            <button class="close-chat" id="close-chat">✕</button>
+        </div>
+        <div class="chat-box" id="chat-box">
+            <div class="message system-message fade-in-up">
+                <div class="avatar">🤖</div>
+                <div class="bubble-container">
+                    <div class="bubble glass">Welcome! Ask me anything about voting or elections.</div>
+                </div>
+            </div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Type your question..." autocomplete="off">
+            <button id="send-btn" class="btn-primary">➤</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer glass">
+        <div class="footer-content">
+            <div class="footer-logo">VoteWise<span class="text-primary">AI</span></div>
+            <p>&copy; 2026. Empowering Democracy through Technology.</p>
         </div>
     </footer>
 
-    <script src="js/accessibility.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
