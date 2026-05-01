@@ -87,8 +87,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // API endpoint for FastAPI backend
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    // For Google Cloud deployment, update this with your actual Cloud Run backend URL
-    const API_BASE_URL = isLocalhost ? 'http://localhost:8000' : 'https://YOUR_BACKEND_CLOUD_RUN_URL.a.run.app';
+    // For Google Cloud deployment, this is your actual Cloud Run backend URL
+    const API_BASE_URL = isLocalhost ? 'http://localhost:8000' : 'https://votewise-backend-74clgpdhmq-uc.a.run.app';
     const API_URL = `${API_BASE_URL}/api/v1/chat/`;
 
     if (chatBox && userInput && sendBtn) {
