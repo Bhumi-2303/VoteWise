@@ -1,7 +1,7 @@
 steps:
-  # 1. Build the Backend Docker Image
+  # 1. Build the Backend Docker Image (Forced Clean Build)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/votewise-backend', '-f', 'backend/Dockerfile', '.']
+    args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT_ID/votewise-backend', '-f', 'backend/Dockerfile', '.']
   
   # 2. Push the Backend Image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
@@ -28,9 +28,9 @@ steps:
       - '--set-secrets'
       - 'GEMINI_API_KEY=gemini-api-key:latest'
 
-  # 4. Build the Frontend Docker Image
+  # 4. Build the Frontend Docker Image (Forced Clean Build)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/votewise-frontend', '-f', 'frontend/Dockerfile', '.']
+    args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT_ID/votewise-frontend', '-f', 'frontend/Dockerfile', '.']
   
   # 5. Push the Frontend Image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
