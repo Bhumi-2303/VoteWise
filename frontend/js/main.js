@@ -105,6 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const CHAT_API_URL = `${API_BASE_URL}/api/v1/chat/`;
     const VERSION_API_URL = `${API_BASE_URL}/api/v1/version`;
 
+    // State
+    let isSending = false;
+    let chatHistory = JSON.parse(sessionStorage.getItem('chatHistory')) || [];
+
     // Utility: Native fetch with timeout using AbortController to prevent memory leaks and infinite hanging
     const fetchWithTimeout = async (resource, options = {}) => {
         const { timeout = 8000 } = options;
@@ -124,7 +128,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const createMessage = (sender, text) => {
+    const safeHTML = (text) => {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+
+    const renderMarkdown = (text) => {
+        // Safe HTML escaping then markdown parsing
+        let safeText = safeHTML(text);
+        return safeText
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*(.*?)\*/g, '<em>$1</em>')
+            .replace(/`(.*?)`/g, '<code>$1</code>');
+    };
+
+    const createMessage = (sender, text, save = true) => {
         const div = document.createElement('div');
         div.className = `message ${sender}-message fade-in-up`;
         
@@ -138,16 +158,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const bubble = document.createElement('div');
         bubble.className = `bubble ${sender === 'system' ? 'glass' : ''}`;
         
-        // Simple markdown parsing
-        bubble.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        bubble.innerHTML = renderMarkdown(text);
         
         bubbleContainer.appendChild(bubble);
         div.appendChild(avatar);
         div.appendChild(bubbleContainer);
         chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        
+        // Scroll with a tiny delay to ensure rendering completes
+        requestAnimationFrame(() => {
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        if (save && text.trim() !== '') {
+            chatHistory.push({ sender, text });
+            sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+        }
+
         return bubble;
     };
+
+    // Initialize chat
+    const initChat = () => {
+        // Clear default welcome message if there is history
+        if (chatHistory.length > 0) {
+            chatBox.innerHTML = '';
+            chatHistory.forEach(msg => createMessage(msg.sender, msg.text, false));
+        }
+    };
+    initChat();
 
     const addTypingIndicator = () => {
         const div = document.createElement('div');
@@ -158,23 +197,20 @@ document.addEventListener('DOMContentLoaded', () => {
         chatBox.scrollTop = chatBox.scrollHeight;
     };
 
-    const typeEffect = (element, text) => {
-        element.innerHTML = '';
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    const sendMessage = async (retryText = null) => {
+        if (isSending) return; // Prevent race conditions & duplicate messages
         
-        // Fast instant display for better UX since streaming isn't fully supported on backend yet
-        element.innerHTML = tempDiv.innerHTML;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    };
-
-    const sendMessage = async () => {
-        const text = userInput.value.trim();
+        const text = retryText || userInput.value.trim();
         if (!text) return;
 
-        createMessage('user', text);
-        userInput.value = '';
+        if (!retryText) {
+            createMessage('user', text);
+            userInput.value = '';
+        }
+
+        isSending = true;
         sendBtn.disabled = true;
+        userInput.disabled = true; // Prevent input while sending for mobile
         
         addTypingIndicator();
 
@@ -204,8 +240,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await response.json();
                 document.getElementById('typing-indicator')?.remove();
                 
-                const bubble = createMessage('system', '');
-                typeEffect(bubble, data.reply);
+                createMessage('system', data.reply, true);
                 success = true;
             } catch (error) {
                 attempts++;
@@ -214,7 +249,23 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.error("Chat API Error:", error.message || error);
                     }
                     document.getElementById('typing-indicator')?.remove();
-                    createMessage('system', "⚠️ **Connection Error:** Our AI backend is currently unreachable. Please check your connection or try again later.");
+                    
+                    // Create fallback message with retry button
+                    const fallbackText = `⚠️ **Connection Error:** Our AI backend is unreachable. Please try again.`;
+                    const bubble = createMessage('system', fallbackText, false);
+                    
+                    const retryBtn = document.createElement('button');
+                    retryBtn.className = 'btn-primary retry-btn';
+                    retryBtn.style.marginTop = '10px';
+                    retryBtn.style.padding = '5px 10px';
+                    retryBtn.style.fontSize = '0.8rem';
+                    retryBtn.textContent = 'Retry Message';
+                    retryBtn.onclick = () => {
+                        bubble.parentElement.parentElement.remove(); // Remove error message
+                        sendMessage(text); // Retry
+                    };
+                    bubble.appendChild(retryBtn);
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 } else {
                     // Exponential backoff before retry (1s, 2s, ...)
                     await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
@@ -222,14 +273,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
+        isSending = false;
         sendBtn.disabled = false;
+        userInput.disabled = false;
         userInput.focus();
     };
 
-    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+    if (sendBtn) sendBtn.addEventListener('click', () => sendMessage());
     if (userInput) {
         userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+            if (e.key === 'Enter' && !sendBtn.disabled) {
+                e.preventDefault();
+                sendMessage();
+            }
         });
     }
 
