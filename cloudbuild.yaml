@@ -1,87 +1,84 @@
 steps:
-  # 1. Build the Backend Docker Image (Forced Clean Build)
+  # 1. Build Backend Image
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      [
-        'build',
-        '--no-cache',
-        '-t',
-        'gcr.io/$PROJECT_ID/votewise-backend',
-        '-f',
-        'backend/Dockerfile',
-        '.'
-      ]
+    id: 'build-backend'
+    args: 
+      - 'build'
+      - '-t'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:$SHORT_SHA'
+      - '-t'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:latest'
+      - '-f'
+      - 'backend/Dockerfile'
+      - '.'
 
-  # 2. Push the Backend Image to Google Container Registry
+  # 2. Build Frontend Image
   - name: 'gcr.io/cloud-builders/docker'
-    args:
-      [
-        'push',
-        'gcr.io/$PROJECT_ID/votewise-backend'
-      ]
+    id: 'build-frontend'
+    args: 
+      - 'build'
+      - '-t'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend:$SHORT_SHA'
+      - '-t'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend:latest'
+      - '-f'
+      - 'frontend/Dockerfile'
+      - '.'
 
-  # 3. Deploy Backend to Cloud Run
+  # 3. Push Backend Image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-backend'
+    args: ['push', '--all-tags', '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend']
+
+  # 4. Push Frontend Image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-frontend'
+    args: ['push', '--all-tags', '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend']
+
+  # 5. Deploy Backend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-backend'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
       - 'votewise-backend'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/votewise-backend'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:$SHORT_SHA'
       - '--region'
-      - 'us-central1'
+      - '$_DEPLOY_REGION'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--port'
-      - '8080'
       - '--set-env-vars'
       - 'ENVIRONMENT=production,DEBUG=False'
       - '--set-secrets'
-      - 'GEMINI_API_KEY=gemini-api-key:latest'
-
-  # 4. Build the Frontend Docker Image (Forced Clean Build)
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      [
-        'build',
-        '--no-cache',
-        '-t',
-        'gcr.io/$PROJECT_ID/votewise-frontend',
-        '-f',
-        'frontend/Dockerfile',
-        '.'
-      ]
-
-  # 5. Push the Frontend Image to Google Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      [
-        'push',
-        'gcr.io/$PROJECT_ID/votewise-frontend'
-      ]
+      - 'GEMINI_API_KEY=GEMINI_API_KEY:latest,GOOGLE_CIVIC_API_KEY=GOOGLE_CIVIC_API_KEY:latest'
 
   # 6. Deploy Frontend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'deploy-frontend'
     entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
       - 'votewise-frontend'
       - '--image'
-      - 'gcr.io/$PROJECT_ID/votewise-frontend'
+      - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend:$SHORT_SHA'
       - '--region'
-      - 'us-central1'
+      - '$_DEPLOY_REGION'
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
-      - '--port'
-      - '8080'
 
 images:
-  - 'gcr.io/$PROJECT_ID/votewise-backend'
-  - 'gcr.io/$PROJECT_ID/votewise-frontend'
+  - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:$SHORT_SHA'
+  - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend:$SHORT_SHA'
+
+substitutions:
+  _AR_REGION: 'us-central1'
+  _AR_REPO: 'votewise'
+  _DEPLOY_REGION: 'us-central1'
 
 options:
-  logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING

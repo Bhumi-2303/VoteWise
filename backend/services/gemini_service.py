@@ -9,6 +9,7 @@ from google.genai import errors as genai_errors
 from backend.core.config import settings
 from backend.utils.logger import app_logger
 from backend.prompts import build_system_instruction, build_user_prompt
+from backend.services.fallback_service import get_fallback_response
 
 # The supported model to use for chat responses
 # Based on diagnostics, gemini-2.0-flash is the primary available model for this account
@@ -75,32 +76,29 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         return "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
 
     except asyncio.TimeoutError:
-        app_logger.error("Gemini API request timed out after 20 seconds.")
-        return "⏱️ The request took too long to process. Please try again."
+        app_logger.error("Gemini API request timed out. Triggering fallback.")
+        return get_fallback_response(prompt, language)
 
     except genai_errors.ClientError as e:
         status = getattr(e, "status_code", getattr(e, "code", None))
         app_logger.error(f"Gemini ClientError [{status}]: {str(e)}")
-
-        if status == 429:
+        
+        # Trigger fallback for rate limits or server errors
+        if status in (429, 500, 503):
+            return get_fallback_response(prompt, language)
+            
+        if status == 404:
             return (
-                "⚠️ The AI assistant is currently rate-limited. "
-                "Please wait a moment and try again."
+                f"⚠️ Model '{GEMINI_MODEL}' not found. Please verify that this model is "
+                "available in your region and supported by your API key."
             )
         if status in (401, 403):
             return (
                 "⚠️ API authentication failed. Please verify your Gemini API key "
                 "in the .env file or Secret Manager."
             )
-        if status == 404:
-            return (
-                f"⚠️ Model '{GEMINI_MODEL}' not found. Please verify that this model is "
-                "available in your region and supported by your API key."
-            )
-        return (
-            f"⚠️ Technical difficulties connecting to the knowledge base. Details: [{status}] {str(e)}"
-        )
+        return get_fallback_response(prompt, language)
 
     except Exception as e:
         app_logger.exception(f"Unexpected error in Gemini service: {type(e).__name__}: {str(e)}")
-        return f"⚠️ An unexpected error occurred: {type(e).__name__}: {str(e)}"
+        return get_fallback_response(prompt, language)

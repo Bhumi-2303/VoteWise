@@ -58,7 +58,17 @@ def create_app() -> FastAPI:
             },
         )
 
-    # Root Endpoint
+    @app.get("/health", tags=["Health"])
+    async def health_check():
+        """Liveness probe for Cloud Run."""
+        return {"status": "alive", "version": settings.VERSION}
+
+    @app.get("/ready", tags=["Health"])
+    async def readiness_check():
+        """Readiness probe for Cloud Run."""
+        # Add logic here to check external services if needed
+        return {"status": "ready"}
+
     @app.get("/", tags=["Root"])
     def home():
         return {"message": "Backend is running successfully"}
