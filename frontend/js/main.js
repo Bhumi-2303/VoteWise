@@ -314,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
         container.innerHTML = '';
         container.classList.remove('hidden');
 
-        const promptKeys = ['prompt_vote_where', 'prompt_docs', 'prompt_compare', 'prompt_ballot'];
+        const promptKeys = ['prompt_next_election', 'prompt_register', 'prompt_candidates', 'prompt_id'];
         promptKeys.forEach(key => {
             const text = window.getTranslation(key, window.currentLanguage);
             if (!text) return;
@@ -322,7 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const chip = document.createElement('button');
             chip.className = 'prompt-chip fade-in-up';
             chip.textContent = text;
-            chip.onclick = () => sendMessage(text);
+            chip.onclick = () => {
+                userInput.value = text;
+                sendMessage();
+            };
             container.appendChild(chip);
         });
     };
@@ -373,11 +376,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
         while (attempts < maxAttempts && !success) {
             try {
+                // Map internal history to API format (role: user/assistant)
+                const localeMap = { "English": "en", "Hindi": "hi", "Gujarati": "gu" };
+                const apiMessages = chatHistory.map(msg => ({
+                    role: msg.sender === 'user' ? 'user' : 'assistant',
+                    content: msg.text
+                }));
+
                 // Using fetchWithTimeout to prevent UI freeze
                 const response = await fetchWithTimeout(CHAT_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, language: window.currentLanguage }),
+                    body: JSON.stringify({ 
+                        messages: apiMessages, 
+                        locale: localeMap[window.currentLanguage] || "en" 
+                    }),
                     timeout: 15000 // 15 seconds max for chat response
                 });
 
@@ -404,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     document.getElementById('typing-indicator')?.remove();
                     
                     // Create fallback message with retry button
-                    const fallbackText = `⚠️ **Connection Error:** Our AI backend is unreachable. Please try again.`;
+                    const fallbackText = `⚠️ Something went wrong. Please try again.`;
                     const bubble = createMessage('system', fallbackText, false);
                     
                     const retryBtn = document.createElement('button');
