@@ -181,6 +181,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeChat) closeChat.addEventListener('click', closeChatPanel);
     if(heroChatBtn) heroChatBtn.addEventListener('click', (e) => { e.preventDefault(); openChat(); });
 
+    const resetBtn = document.getElementById('reset-chat');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            if (confirm("Reset chat history?")) {
+                sessionStorage.removeItem('chatHistory');
+                chatHistory = [];
+                chatBox.innerHTML = '';
+                // Add initial welcome
+                createMessage('system', window.getTranslation('chat_welcome', window.currentLanguage), false);
+                renderSuggestedPrompts();
+                window.showToast("Conversation reset.", "success");
+            }
+        });
+    }
+
     // Escape key to close modals
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {

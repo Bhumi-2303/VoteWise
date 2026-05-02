@@ -4,7 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoteWise AI - Premium Civic Education</title>
-    <meta name="description" content="Your intelligent civic education assistant. Get unbiased, accurate information about elections.">
+    <meta name="description" content="Your intelligent civic education assistant. Get unbiased, accurate information about elections and democratic processes.">
+    <meta name="keywords" content="voting, elections, civic education, AI assistant, voter information">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="VoteWise AI - Premium Civic Education">
+    <meta property="og:description" content="Your intelligent civic education assistant. Get unbiased, accurate information about elections.">
+    <meta property="og:image" content="https://votewise.ai/og-image.jpg">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="VoteWise AI - Premium Civic Education">
+    <meta property="twitter:description" content="Your intelligent civic education assistant. Get accurate civic data.">
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
@@ -206,7 +219,10 @@
                     </div>
                 </div>
             </div>
-            <button class="close-chat" id="close-chat" aria-label="Close Chat">✕</button>
+            <div class="chat-header-actions" style="display: flex; gap: 0.5rem;">
+                <button class="icon-btn" id="reset-chat" title="Reset Conversation" aria-label="Reset Conversation" style="color: white; font-size: 1rem;">🔄</button>
+                <button class="close-chat" id="close-chat" aria-label="Close Chat">✕</button>
+            </div>
         </div>
         <div class="chat-box" id="chat-box" aria-live="polite">
             <div class="message system-message fade-in-up">
