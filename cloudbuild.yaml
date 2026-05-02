@@ -42,7 +42,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'votewise-backend'
+      - '$_BACKEND_SERVICE'
       - '--image'
       - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:$SHORT_SHA'
       - '--region'
@@ -51,7 +51,7 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'ENVIRONMENT=production,DEBUG=False'
+      - 'ENVIRONMENT=$_ENVIRONMENT,DEBUG=$_DEBUG,PORT=8080'
       - '--set-secrets'
       - 'GEMINI_API_KEY=GEMINI_API_KEY:latest,GOOGLE_CIVIC_API_KEY=GOOGLE_CIVIC_API_KEY:latest'
 
@@ -62,7 +62,7 @@ steps:
     args:
       - 'run'
       - 'deploy'
-      - 'votewise-frontend'
+      - '$_FRONTEND_SERVICE'
       - '--image'
       - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/frontend:$SHORT_SHA'
       - '--region'
@@ -70,6 +70,8 @@ steps:
       - '--platform'
       - 'managed'
       - '--allow-unauthenticated'
+      - '--set-env-vars'
+      - 'PORT=8080'
 
 images:
   - '$_AR_REGION-docker.pkg.dev/$PROJECT_ID/$_AR_REPO/backend:$SHORT_SHA'
@@ -79,6 +81,10 @@ substitutions:
   _AR_REGION: 'us-central1'
   _AR_REPO: 'votewise'
   _DEPLOY_REGION: 'us-central1'
+  _BACKEND_SERVICE: 'votewise-backend'
+  _FRONTEND_SERVICE: 'votewise-frontend'
+  _ENVIRONMENT: 'production'
+  _DEBUG: 'False'
 
 options:
   logging: CLOUD_LOGGING
