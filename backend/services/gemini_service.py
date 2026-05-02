@@ -11,7 +11,8 @@ from backend.utils.logger import app_logger
 from backend.prompts import build_system_instruction, build_user_prompt
 
 # The supported model to use for chat responses
-GEMINI_MODEL = "gemini-2.0-flash"
+# Using the stable 'gemini-1.5-flash' which is widely available across v1 and v1beta
+GEMINI_MODEL = "gemini-1.5-flash"
 
 # Lazily initialised client — created once when the first request arrives
 _client: genai.Client | None = None
@@ -90,6 +91,11 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
             return (
                 "⚠️ API authentication failed. Please verify your Gemini API key "
                 "in the .env file or Secret Manager."
+            )
+        if status == 404:
+            return (
+                f"⚠️ Model '{GEMINI_MODEL}' not found. Please verify that this model is "
+                "available in your region and supported by your API key."
             )
         return (
             f"⚠️ Technical difficulties connecting to the knowledge base. Details: [{status}] {str(e)}"
