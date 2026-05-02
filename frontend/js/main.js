@@ -67,16 +67,22 @@ document.addEventListener('DOMContentLoaded', () => {
     // Mobile Menu
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const mobileMenu = document.getElementById('mobile-menu');
-    if(mobileMenuBtn) {
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('active');
-            mobileMenuBtn.textContent = mobileMenu.classList.contains('active') ? '✕' : '☰';
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = mobileMenu.classList.toggle('active');
+            mobileMenuBtn.setAttribute('aria-expanded', isOpen);
+            mobileMenu.setAttribute('aria-hidden', !isOpen);
+            mobileMenuBtn.textContent = isOpen ? '✕' : '☰';
+            mobileMenuBtn.setAttribute('aria-label', isOpen ? 'Close Menu' : 'Open Menu');
         });
     }
 
     document.querySelectorAll('.mobile-link').forEach(link => {
         link.addEventListener('click', () => {
             mobileMenu.classList.remove('active');
+            mobileMenuBtn.setAttribute('aria-expanded', 'false');
+            mobileMenu.setAttribute('aria-hidden', 'true');
             mobileMenuBtn.textContent = '☰';
         });
     });
@@ -111,9 +117,13 @@ document.addEventListener('DOMContentLoaded', () => {
         
         langBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            langDropdown.classList.toggle('active');
+            const isOpen = langDropdown.classList.toggle('active');
+            langBtn.setAttribute('aria-expanded', isOpen);
         });
-        document.addEventListener('click', () => langDropdown.classList.remove('active'));
+        document.addEventListener('click', () => {
+            langDropdown.classList.remove('active');
+            langBtn.setAttribute('aria-expanded', 'false');
+        });
 
         langDropdown.querySelectorAll('a').forEach(opt => {
             opt.addEventListener('click', (e) => {
@@ -124,6 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 localStorage.setItem('language', langName);
                 langBtn.innerHTML = langFlags[langName] + ' ▼';
                 langDropdown.classList.remove('active');
+                langBtn.setAttribute('aria-expanded', 'false');
                 
                 applyTranslations(langName);
             });
@@ -142,19 +153,52 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const openChat = () => {
         chatPanel.classList.add('active');
+        chatFab.setAttribute('aria-expanded', 'true');
+        chatPanel.setAttribute('aria-hidden', 'false');
         setTimeout(() => userInput.focus(), 300);
     };
 
-    const toggleChat = () => {
-        chatPanel.classList.toggle('active');
-        if (chatPanel.classList.contains('active')) {
-            setTimeout(() => userInput.focus(), 300);
-        }
+    // Chat Toggle
+    if(chatFab) {
+        chatFab.addEventListener('click', () => {
+            const isOpen = chatPanel.classList.toggle('active');
+            chatFab.setAttribute('aria-expanded', isOpen);
+            chatPanel.setAttribute('aria-hidden', !isOpen);
+            if (isOpen) {
+                userInput.focus();
+            }
+        });
+    }
+
+    const closeChatPanel = () => {
+        chatPanel.classList.remove('active');
+        chatFab.setAttribute('aria-expanded', 'false');
+        chatPanel.setAttribute('aria-hidden', 'true');
+        if(chatFab) chatFab.focus();
     };
 
-    if(chatFab) chatFab.addEventListener('click', toggleChat);
-    if(closeChat) closeChat.addEventListener('click', () => chatPanel.classList.remove('active'));
+    if(closeChat) closeChat.addEventListener('click', closeChatPanel);
     if(heroChatBtn) heroChatBtn.addEventListener('click', (e) => { e.preventDefault(); openChat(); });
+
+    // Escape key to close modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (chatPanel && chatPanel.classList.contains('active')) {
+                closeChatPanel();
+            }
+            if (mobileMenu && mobileMenu.classList.contains('active')) {
+                mobileMenu.classList.remove('active');
+                mobileMenuBtn.setAttribute('aria-expanded', 'false');
+                mobileMenu.setAttribute('aria-hidden', 'true');
+                mobileMenuBtn.focus();
+            }
+            if (langDropdown && langDropdown.classList.contains('active')) {
+                langDropdown.classList.remove('active');
+                langBtn.setAttribute('aria-expanded', 'false');
+                langBtn.focus();
+            }
+        }
+    });
 
     // Chat & API Configuration
     const chatBox = document.getElementById('chat-box');

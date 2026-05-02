@@ -9,12 +9,13 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="noise-overlay"></div>
-    <div id="toast-container"></div>
+    <div id="toast-container" role="alert" aria-live="polite"></div>
     <!-- Navigation Bar -->
-    <nav class="navbar glass" id="navbar">
+    <nav class="navbar glass" id="navbar" role="navigation" aria-label="Main Navigation">
         <div class="logo">
-            <span class="logo-icon">🗳️</span>
+            <span class="logo-icon" aria-hidden="true">🗳️</span>
             <span>VoteWise<span class="text-primary">AI</span></span>
         </div>
         <div class="nav-links desktop-only">
@@ -24,31 +25,31 @@
         </div>
         <div class="nav-actions desktop-only">
             <div class="a11y-controls">
-                <button class="icon-btn" id="dark-mode-btn" title="Toggle Dark Mode">🌙</button>
+                <button class="icon-btn" id="dark-mode-btn" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">🌙</button>
             </div>
             <div class="language-selector">
-                <button id="lang-btn" class="glass-btn">🇺🇸 EN ▼</button>
-                <div class="lang-dropdown glass" id="lang-dropdown">
-                    <a href="#" data-lang="English">🇺🇸 English</a>
-                    <a href="#" data-lang="Hindi">🇮🇳 Hindi</a>
-                    <a href="#" data-lang="Gujarati">🇮🇳 Gujarati</a>
+                <button id="lang-btn" class="glass-btn" aria-haspopup="true" aria-expanded="false">🇺🇸 EN ▼</button>
+                <div class="lang-dropdown glass" id="lang-dropdown" role="menu">
+                    <a href="#" data-lang="English" role="menuitem">🇺🇸 English</a>
+                    <a href="#" data-lang="Hindi" role="menuitem">🇮🇳 Hindi</a>
+                    <a href="#" data-lang="Gujarati" role="menuitem">🇮🇳 Gujarati</a>
                 </div>
             </div>
         </div>
-        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open Menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
     </nav>
 
     <!-- Mobile Menu -->
-    <div class="mobile-menu glass" id="mobile-menu">
+    <div class="mobile-menu glass" id="mobile-menu" aria-hidden="true">
         <a href="#features" class="mobile-link" data-i18n="nav_features">Features</a>
         <a href="#election-flow" class="mobile-link" data-i18n="nav_how_it_works">How it Works</a>
         <a href="#timeline" class="mobile-link" data-i18n="nav_timeline">Timeline</a>
         <div class="mobile-actions">
-            <button class="glass-btn" id="mobile-dark-mode-btn">Toggle Dark Mode</button>
+            <button class="glass-btn" id="mobile-dark-mode-btn" aria-label="Toggle Dark Mode">Switch to Dark Mode</button>
         </div>
     </div>
 
-    <main>
+    <main id="main-content">
         <!-- Hero Section -->
         <section class="hero">
             <div class="hero-bg-glow"></div>
@@ -191,41 +192,43 @@
 
     <!-- Floating Chat Panel -->
     <div class="chat-fab-container">
-        <button class="chat-fab btn-glow" id="chat-fab">💬</button>
+        <button class="chat-fab btn-glow" id="chat-fab" aria-label="Open Chat Assistant" aria-haspopup="true" aria-expanded="false">💬</button>
     </div>
 
-    <div class="chat-panel glass" id="chat-panel">
+    <div class="chat-panel glass" id="chat-panel" role="dialog" aria-label="VoteWise AI Assistant" aria-hidden="true">
         <div class="chat-header gradient-bg">
             <div class="chat-title">
-                <span class="avatar-small">🤖</span>
+                <span class="avatar-small" aria-hidden="true">🤖</span>
                 <div>
                     <h3 data-i18n="chat_title">VoteWise AI</h3>
-                    <span class="status-indicator"></span><small data-i18n="chat_online">Online</small>
+                    <div role="status" aria-live="polite">
+                        <span class="status-indicator"></span><small data-i18n="chat_online">Online</small>
+                    </div>
                 </div>
             </div>
-            <button class="close-chat" id="close-chat">✕</button>
+            <button class="close-chat" id="close-chat" aria-label="Close Chat">✕</button>
         </div>
-        <div class="chat-box" id="chat-box">
+        <div class="chat-box" id="chat-box" aria-live="polite">
             <div class="message system-message fade-in-up">
-                <div class="avatar">🤖</div>
+                <div class="avatar" aria-hidden="true">🤖</div>
                 <div class="bubble-container">
                     <div class="bubble glass" data-i18n="chat_welcome">Welcome! Ask me anything about voting or elections.</div>
                 </div>
             </div>
         </div>
         <div class="input-area">
-            <input type="text" id="user-input" placeholder="Type your question..." data-i18n-placeholder="chat_placeholder" autocomplete="off">
-            <button id="send-btn" class="btn-primary">➤</button>
+            <input type="text" id="user-input" placeholder="Type your question..." data-i18n-placeholder="chat_placeholder" autocomplete="off" aria-label="Chat Input">
+            <button id="send-btn" class="btn-primary" aria-label="Send Message">➤</button>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="footer glass">
+    <footer class="footer glass" role="contentinfo">
         <div class="footer-content">
             <div class="footer-logo">VoteWise<span class="text-primary">AI</span></div>
             <p data-i18n="footer_copyright">&copy; 2026. Empowering Democracy through Technology.</p>
             <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                <span data-i18n="footer_version">Deployed Version: v1.1.0 | Backend: </span><span id="backend-version-display">Connecting...</span>
+                <span data-i18n="footer_version">Deployed Version: v1.1.0 | Backend: </span><span id="backend-version-display" role="status" aria-live="polite">Connecting...</span>
             </div>
         </div>
     </footer>

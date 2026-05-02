@@ -45,6 +45,35 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Accessibility: Skip Link */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--primary);
+  color: white;
+  padding: 1rem 2rem;
+  z-index: 10001;
+  border-radius: 0 0 var(--radius-md) var(--radius-md);
+  text-decoration: none;
+  font-weight: 600;
+  transition: top 0.3s ease;
+}
+.skip-link:focus { top: 0; }
+
+/* Standardized Focus States */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 4px;
+}
+.btn:focus-visible, .chat-fab:focus-visible {
+  outline-offset: 2px;
+}
+input:focus-visible {
+  outline-offset: 0;
+}
+
 #noise-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   pointer-events: none; z-index: 9999; opacity: 0.03;
