@@ -9,7 +9,21 @@ steps:
     id: 'build-frontend'
     args: ['build', '-t', 'gcr.io/$PROJECT_ID/votewise-frontend', '-f', 'frontend/Dockerfile', '.']
 
-  # 3. Deploy Backend to Cloud Run
+  # 3. Ensure GEMINI_API_KEY secret exists in Secret Manager
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    id: 'setup-secret'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        if ! gcloud secrets describe GEMINI_API_KEY > /dev/null 2>&1; then
+          echo "Secret GEMINI_API_KEY does not exist. Creating..."
+          echo -n "$_GEMINI_API_KEY" | gcloud secrets create GEMINI_API_KEY --data-file=- --replication-policy="automatic"
+        else
+          echo "Secret GEMINI_API_KEY already exists."
+        fi
+
+  # 4. Deploy Backend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-backend'
     entrypoint: gcloud
@@ -25,9 +39,11 @@ steps:
       - 'managed'
       - '--allow-unauthenticated'
       - '--set-env-vars'
-      - 'GEMINI_API_KEY=$_GEMINI_API_KEY,PORT=8080'
+      - 'PORT=8080'
+      - '--update-secrets'
+      - 'GEMINI_API_KEY=GEMINI_API_KEY:latest'
 
-  # 4. Deploy Frontend to Cloud Run
+  # 5. Deploy Frontend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-frontend'
     entrypoint: gcloud
