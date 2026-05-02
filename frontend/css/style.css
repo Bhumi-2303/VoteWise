@@ -126,8 +126,13 @@ button, .btn { font-family: var(--font-sans); cursor: pointer; transition: var(-
 }
 
 /* Sections */
-.section { padding: 8rem 5%; max-width: 1200px; margin: 0 auto; }
+.section { padding: 8rem 5%; max-width: 1200px; margin: 0 auto; scroll-margin-top: 100px; }
 .section-header { text-align: center; margin-bottom: 4rem; }
+
+@media (max-width: 768px) {
+  .section { padding: 4rem 1.25rem; scroll-margin-top: 80px; }
+  .section-header { margin-bottom: 2.5rem; }
+}
 
 /* Hero */
 .hero { min-height: 100vh; display: flex; align-items: center; justify-content: center; text-align: center; position: relative; padding: 0 5%; }
@@ -137,10 +142,13 @@ button, .btn { font-family: var(--font-sans); cursor: pointer; transition: var(-
 .hero-actions { display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap; justify-content: center; }
 
 /* Bento Grid */
-.bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+.bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
 .bento-card { padding: 2.5rem; border-radius: var(--radius-lg); display: flex; flex-direction: column; gap: 1rem; }
 .span-2 { grid-column: span 2; }
-@media (max-width: 900px) { .span-2 { grid-column: span 1; } }
+@media (max-width: 900px) { 
+  .span-2 { grid-column: span 1; }
+  .bento-card { padding: 1.5rem; }
+}
 .icon-wrap { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
 
 /* Timeline */
@@ -188,7 +196,9 @@ button, .btn { font-family: var(--font-sans); cursor: pointer; transition: var(-
 
 @media (max-width: 480px) {
   .chat-panel { width: 100%; height: 100%; bottom: 0; right: 0; border-radius: 0; max-height: 100vh; }
-  .chat-fab-container { bottom: 1rem; right: 1rem; }
+  .chat-fab-container { bottom: 1.5rem; right: 1.5rem; }
+  .chat-header { padding: 1.25rem 1.5rem; }
+  .input-area { padding: 1.25rem; }
 }
 
 /* Animations */
