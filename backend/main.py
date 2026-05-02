@@ -56,9 +56,12 @@ def create_app() -> FastAPI:
     def home():
         return {"message": "Backend is running successfully"}
 
+    from backend.routes import health, chat, debug
+    
     # Include Routers
     app.include_router(health.router, prefix="/api/v1", tags=["Health"])
     app.include_router(chat.router, prefix="/api/v1/chat", tags=["Chat"])
+    app.include_router(debug.router, prefix="/api/v1", tags=["Debug"])
 
     return app
 
