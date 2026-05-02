@@ -421,6 +421,86 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Candidate Comparison AI Feature
+    const compareBtn = document.getElementById('compare-btn');
+    const c1Input = document.getElementById('candidate-1');
+    const c2Input = document.getElementById('candidate-2');
+    const compResults = document.getElementById('comparison-results');
+    const compSkeleton = document.getElementById('comparison-skeleton');
+
+    if (compareBtn) {
+        compareBtn.addEventListener('click', async () => {
+            const c1 = c1Input.value.trim();
+            const c2 = c2Input.value.trim();
+
+            if (!c1 || !c2) {
+                window.showToast("Please enter names for both candidates.", "warning");
+                return;
+            }
+
+            compareBtn.disabled = true;
+            compResults.classList.add('hidden');
+            compSkeleton.classList.remove('hidden');
+            compResults.innerHTML = '';
+
+            try {
+                const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/compare/`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ candidate1: c1, candidate2: c2, language: window.currentLanguage }),
+                    timeout: 25000 // Comparison takes longer
+                });
+
+                if (!response.ok) throw new Error("Failed to fetch comparison.");
+
+                const data = await response.json();
+                
+                // Construct Grid
+                let gridHtml = `<div class="comparison-grid">`;
+                data.comparison.forEach(item => {
+                    gridHtml += `
+                        <div class="comparison-card fade-in-up">
+                            <div class="comp-point c1">${item.c1}</div>
+                            <div class="category-name">${item.category}</div>
+                            <div class="comp-point c2">${item.c2}</div>
+                        </div>
+                    `;
+                });
+                gridHtml += `</div>`;
+                
+                // Add Summary and Share
+                const summaryHtml = `
+                    <div class="comparison-summary fade-in-up">
+                        <p>${data.summary}</p>
+                    </div>
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn btn-secondary glass-btn" id="share-comp">📋 Copy Comparison</button>
+                    </div>
+                `;
+
+                compResults.innerHTML = gridHtml + summaryHtml;
+                
+                document.getElementById('share-comp').onclick = () => {
+                    const text = data.comparison.map(i => `${i.category}\n${c1}: ${i.c1}\n${c2}: ${i.c2}`).join('\n\n');
+                    navigator.clipboard.writeText(text);
+                    window.showToast("Comparison copied to clipboard!", "success");
+                };
+
+                compResults.classList.remove('hidden');
+            } catch (err) {
+                console.error(err);
+                window.showToast("AI Comparison failed. Please try again.", "error");
+            } finally {
+                compSkeleton.classList.add('hidden');
+                compareBtn.disabled = false;
+                // Scroll to results
+                requestAnimationFrame(() => {
+                    compResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            }
+        });
+    }
+
     if (versionDisplay) {
         initializeHealthCheck();
     }
