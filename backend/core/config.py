@@ -17,5 +17,6 @@ class Settings:
     
     # API Keys
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    GOOGLE_CIVIC_API_KEY: str = os.getenv("GOOGLE_CIVIC_API_KEY", "")
 
 settings = Settings()

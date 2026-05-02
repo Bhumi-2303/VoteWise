@@ -501,6 +501,86 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Election Lookup Feature
+    const lookupBtn = document.getElementById('lookup-btn');
+    const lookupAddress = document.getElementById('lookup-address');
+    const lookupResults = document.getElementById('lookup-results');
+    const lookupSkeleton = document.getElementById('lookup-skeleton');
+    const electionList = document.getElementById('election-list');
+    const repList = document.getElementById('rep-list');
+
+    if (lookupBtn) {
+        lookupBtn.addEventListener('click', async () => {
+            const address = lookupAddress.value.trim();
+            if (!address) {
+                window.showToast("Please enter a ZIP code or address.", "warning");
+                return;
+            }
+
+            lookupBtn.disabled = true;
+            lookupResults.classList.add('hidden');
+            lookupSkeleton.classList.remove('hidden');
+            electionList.innerHTML = '';
+            repList.innerHTML = '';
+
+            try {
+                const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/lookup/?address=${encodeURIComponent(address)}`, {
+                    timeout: 15000
+                });
+
+                if (!response.ok) throw new Error("Lookup failed.");
+
+                const data = await response.json();
+
+                if (data.elections && data.elections.length > 0) {
+                    data.elections.forEach(e => {
+                        const card = document.createElement('div');
+                        card.className = 'lookup-card fade-in-up';
+                        card.innerHTML = `
+                            <div>
+                                <div class="card-title">${e.name}</div>
+                                <div class="card-subtitle">Election Day: ${e.date || 'TBD'}</div>
+                            </div>
+                            <div class="card-meta">Official Election</div>
+                        `;
+                        electionList.appendChild(card);
+                    });
+                } else {
+                    electionList.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No upcoming elections found for this area.</p>';
+                }
+
+                if (data.representatives && data.representatives.length > 0) {
+                    data.representatives.forEach(r => {
+                        const card = document.createElement('div');
+                        card.className = 'lookup-card fade-in-up';
+                        card.innerHTML = `
+                            <div>
+                                <div class="card-title">${r.name}</div>
+                                <div class="card-subtitle">${r.title}</div>
+                            </div>
+                            <div class="card-meta">${r.party || 'Independent'}</div>
+                        `;
+                        repList.appendChild(card);
+                    });
+                }
+
+                lookupResults.classList.remove('hidden');
+                if (data.is_demo) {
+                    window.showToast("Note: Using sample data (API Key not configured).", "info");
+                }
+            } catch (err) {
+                console.error(err);
+                window.showToast("Failed to find election data. Please check your ZIP code.", "error");
+            } finally {
+                lookupSkeleton.classList.add('hidden');
+                lookupBtn.disabled = false;
+                requestAnimationFrame(() => {
+                    lookupResults.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            }
+        });
+    }
+
     if (versionDisplay) {
         initializeHealthCheck();
     }
