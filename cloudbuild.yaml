@@ -1,11 +1,24 @@
 steps:
   # 1. Build the Backend Docker Image (Forced Clean Build)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT_ID/votewise-backend', '-f', 'backend/Dockerfile', '.']
-  
+    args:
+      [
+        'build',
+        '--no-cache',
+        '-t',
+        'gcr.io/$PROJECT_ID/votewise-backend',
+        '-f',
+        'backend/Dockerfile',
+        '.'
+      ]
+
   # 2. Push the Backend Image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/votewise-backend']
+    args:
+      [
+        'push',
+        'gcr.io/$PROJECT_ID/votewise-backend'
+      ]
 
   # 3. Deploy Backend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -30,11 +43,24 @@ steps:
 
   # 4. Build the Frontend Docker Image (Forced Clean Build)
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '--no-cache', '-t', 'gcr.io/$PROJECT_ID/votewise-frontend', '-f', 'frontend/Dockerfile', '.']
-  
+    args:
+      [
+        'build',
+        '--no-cache',
+        '-t',
+        'gcr.io/$PROJECT_ID/votewise-frontend',
+        '-f',
+        'frontend/Dockerfile',
+        '.'
+      ]
+
   # 5. Push the Frontend Image to Google Container Registry
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/votewise-frontend']
+    args:
+      [
+        'push',
+        'gcr.io/$PROJECT_ID/votewise-frontend'
+      ]
 
   # 6. Deploy Frontend to Cloud Run
   - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
@@ -52,3 +78,10 @@ steps:
       - '--allow-unauthenticated'
       - '--port'
       - '8080'
+
+images:
+  - 'gcr.io/$PROJECT_ID/votewise-backend'
+  - 'gcr.io/$PROJECT_ID/votewise-frontend'
+
+options:
+  logging: CLOUD_LOGGING_ONLY
