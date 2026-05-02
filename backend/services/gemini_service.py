@@ -30,35 +30,33 @@ def _get_client() -> genai.Client:
     return _client
 
 
-async def get_ai_response(prompt: str, language: str = "English") -> str:
+async def get_ai_response(contents: list | str, system_instruction: str = None) -> str:
     """
     Generate an AI response using the Gemini API with timeout and error handling.
-    Returns a safe fallback string if any error occurs.
+    Accepts either a single prompt string or a list of message objects for conversation history.
+    Returns the response text or raises an exception for the route handler to catch.
     """
     if not settings.GEMINI_API_KEY:
         app_logger.error("Attempted to call Gemini API without an API key.")
-        return (
-            "⚠️ The AI assistant is currently unavailable due to missing API "
-            "configuration. Please contact the administrator."
-        )
+        raise RuntimeError("GEMINI_API_KEY is not set.")
 
     try:
         client = _get_client()
 
-        # Compose the full system instruction and user prompt
-        system_instruction = build_system_instruction()
-        formatted_prompt = build_user_prompt(prompt, language)
+        # If system_instruction is not provided, use the default builder
+        if system_instruction is None:
+            system_instruction = build_system_instruction()
 
         app_logger.info(
             f"Sending request to Gemini [{GEMINI_MODEL}] | "
-            f"Language: {language} | Prompt length: {len(prompt)} chars"
+            f"Messages: {len(contents) if isinstance(contents, list) else 1}"
         )
 
         # Wrap the async call in a timeout guard
         response = await asyncio.wait_for(
             client.aio.models.generate_content(
                 model=GEMINI_MODEL,
-                contents=formatted_prompt,
+                contents=contents,
                 config={
                     "system_instruction": system_instruction,
                     "temperature": 0.7,
@@ -76,29 +74,14 @@ async def get_ai_response(prompt: str, language: str = "English") -> str:
         return "I'm sorry, I couldn't generate a response. Please try rephrasing your question."
 
     except asyncio.TimeoutError:
-        app_logger.error("Gemini API request timed out. Triggering fallback.")
-        return get_fallback_response(prompt, language)
+        app_logger.error("Gemini API request timed out.")
+        raise
 
     except genai_errors.ClientError as e:
         status = getattr(e, "status_code", getattr(e, "code", None))
         app_logger.error(f"Gemini ClientError [{status}]: {str(e)}")
-        
-        # Trigger fallback for rate limits or server errors
-        if status in (429, 500, 503):
-            return get_fallback_response(prompt, language)
+        raise
             
-        if status == 404:
-            return (
-                f"⚠️ Model '{GEMINI_MODEL}' not found. Please verify that this model is "
-                "available in your region and supported by your API key."
-            )
-        if status in (401, 403):
-            return (
-                "⚠️ API authentication failed. Please verify your Gemini API key "
-                "in the .env file or Secret Manager."
-            )
-        return get_fallback_response(prompt, language)
-
     except Exception as e:
         app_logger.exception(f"Unexpected error in Gemini service: {type(e).__name__}: {str(e)}")
-        return get_fallback_response(prompt, language)
+        raise

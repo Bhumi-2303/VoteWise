@@ -61,7 +61,7 @@ def create_app() -> FastAPI:
     @app.get("/health", tags=["Health"])
     async def health_check():
         """Liveness probe for Cloud Run."""
-        return {"status": "alive", "version": settings.VERSION}
+        return {"status": "ok", "model": "gemini-2.0-flash"}
 
     @app.get("/ready", tags=["Health"])
     async def readiness_check():

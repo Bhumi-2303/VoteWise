@@ -48,7 +48,7 @@ async def compare_candidates(request: CompareRequest):
     """
 
     try:
-        raw_response = await get_ai_response(prompt, request.language)
+        raw_response = await get_ai_response(contents=prompt)
         
         # Clean up the response in case the model adds markdown code blocks
         json_match = re.search(r'\{.*\}', raw_response, re.DOTALL)
