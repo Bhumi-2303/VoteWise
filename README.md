@@ -25,7 +25,7 @@ Many citizens, especially first-time voters or non-native English speakers, find
 ## 🛠️ 4. Tech Stack
 - **Frontend:** HTML5, CSS3 (Modern Glassmorphism & Animations), Vanilla JavaScript
 - **Backend:** Python 3.10, FastAPI, Uvicorn
-- **AI Engine:** Google Gemini (gemini-1.5-flash) via `google-generativeai`
+- **AI Engine:** Google Gemini (gemini-2.0-flash) via `google-genai`
 - **Validation:** Pydantic
 - **Deployment:** Vercel (Frontend), Render (Backend)
 
