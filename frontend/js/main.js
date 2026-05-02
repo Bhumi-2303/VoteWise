@@ -1,8 +1,40 @@
 // Language Management Initialization
 window.currentLanguage = localStorage.getItem('language') || "English";
 
+// Global Production Error Handling
+window.onerror = (msg, url, line, col, error) => {
+    console.error(`[Global Error]: ${msg} at ${url}:${line}:${col}`, error);
+    if (window.showToast) window.showToast("An unexpected UI error occurred.", "error");
+    return false;
+};
+
+window.onunhandledrejection = (event) => {
+    console.error("[Unhandled Promise]:", event.reason);
+    if (window.showToast) window.showToast("A background task failed.", "error");
+};
+
+// Toast Notification System
+window.showToast = (message, type = 'info', duration = 4000) => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    
+    const icons = { info: 'ℹ️', success: '✅', error: '⚠️', warning: '🛜' };
+    toast.innerHTML = `<span>${icons[type] || '•'}</span><span>${message}</span>`;
+    
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+};
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Reveal Animations
+    try {
+        // Reveal Animations
     const revealElements = document.querySelectorAll('.reveal');
     const revealOnScroll = () => {
         revealElements.forEach(el => {
@@ -332,7 +364,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (state === 'degraded' && data) {
             versionDisplay.innerHTML = `v${data.version || 'Unknown'} <span style="color: #f59e0b;">(Degraded 🟡)</span>`;
         } else if (state === 'offline') {
-            versionDisplay.innerHTML = `<span style="color: #ef4444;">Offline 🔴</span>`;
+            versionDisplay.innerHTML = `<span style="color: #ef4444;">Offline 🔴</span> <a href="#" id="retry-health" style="margin-left: 5px; text-decoration: underline; color: var(--primary);">Retry</a>`;
+            const retryLink = document.getElementById('retry-health');
+            if (retryLink) {
+                retryLink.onclick = (e) => {
+                    e.preventDefault();
+                    versionDisplay.textContent = 'Retrying...';
+                    initializeHealthCheck();
+                };
+            }
         }
     };
 
@@ -383,5 +423,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (versionDisplay) {
         initializeHealthCheck();
+    }
+
+    // Offline/Online Detection
+    window.addEventListener('online', () => window.showToast('Connection restored.', 'success'));
+    window.addEventListener('offline', () => window.showToast('You are currently offline.', 'warning'));
+
+    } catch (criticalError) {
+        console.error("[Critical Initialization Error]:", criticalError);
+        // Fallback for extreme cases
+        const footer = document.querySelector('.footer');
+        if (footer) footer.innerHTML += '<p style="color: #ef4444; font-size: 0.7rem;">Application load failed. Please refresh.</p>';
     }
 });
