@@ -1,5 +1,13 @@
-// Language Management Initialization
-window.currentLanguage = localStorage.getItem('language') || "English";
+// Internationalization State
+window.currentLocale = localStorage.getItem('locale') || 'en';
+window.currentCountry = localStorage.getItem('country') || 'USA';
+
+const COUNTRY_CONFIG = {
+    "USA": { flag: "🇺🇸", languages: { "en": "English" } },
+    "India": { flag: "🇮🇳", languages: { "en": "English", "hi": "Hindi", "gu": "Gujarati", "ta": "Tamil" } },
+    "UK": { flag: "🇬🇧", languages: { "en": "English" } },
+    "Canada": { flag: "🇨🇦", languages: { "en": "English", "fr": "French" } }
+};
 
 // Global Production Error Handling
 window.onerror = (msg, url, line, col, error) => {
@@ -88,23 +96,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Language Management & Translations
-    const applyTranslations = (lang) => {
-        if (!window.getTranslation) return; // Fallback if i18n.js is not loaded
+    const applyTranslations = (locale) => {
+        if (!window.translations) return; 
+
+        const content = window.translations[locale] || window.translations['en'];
 
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
-            const translation = window.getTranslation(key, lang);
+            const translation = content[key];
             if (translation) el.innerHTML = translation;
         });
 
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             const key = el.getAttribute('data-i18n-placeholder');
-            const translation = window.getTranslation(key, lang);
+            const translation = content[key];
             if (translation) el.setAttribute('placeholder', translation);
         });
         
-        const htmlLangMap = { "English": "en", "Hindi": "hi", "Gujarati": "gu" };
-        document.documentElement.lang = htmlLangMap[lang] || "en";
+        document.documentElement.lang = locale;
+    };
+
+    window.setLanguage = (locale) => {
+        window.currentLocale = locale;
+        localStorage.setItem('locale', locale);
+        applyTranslations(locale);
+        renderSuggestedPrompts();
+        updateSelectorUI();
+    };
+
+    const updateSelectorUI = () => {
+        const flagEl = document.getElementById('current-country-flag');
+        const codeEl = document.getElementById('current-lang-code');
+        if (flagEl) flagEl.textContent = COUNTRY_CONFIG[window.currentCountry].flag;
+        if (codeEl) codeEl.textContent = window.currentLocale.toUpperCase();
+
+        // Update active states in dropdown
+        document.querySelectorAll('.country-opt').forEach(opt => {
+            opt.classList.toggle('active', opt.getAttribute('data-country') === window.currentCountry);
+        });
+
+        const langContainer = document.getElementById('language-options');
+        if (langContainer) {
+            langContainer.innerHTML = '';
+            const langs = COUNTRY_CONFIG[window.currentCountry].languages;
+            Object.keys(langs).forEach(code => {
+                const btn = document.createElement('button');
+                btn.className = `lang-opt ${code === window.currentLocale ? 'active' : ''}`;
+                btn.textContent = langs[code];
+                btn.onclick = () => window.setLanguage(code);
+                langContainer.appendChild(btn);
+            });
+        }
+    };
+
+    const setCountry = (country) => {
+        window.currentCountry = country;
+        localStorage.setItem('country', country);
+        
+        // Default to first available language for country if current one isn't supported
+        const supportedLangs = COUNTRY_CONFIG[country].languages;
+        if (!supportedLangs[window.currentLocale]) {
+            window.setLanguage(Object.keys(supportedLangs)[0]);
+        } else {
+            updateSelectorUI();
+        }
+    };
+
+    // Auto-detect language on first load
+    const detectLocale = () => {
+        if (localStorage.getItem('locale')) return;
+        
+        const browserLang = navigator.language.split('-')[0];
+        const supported = ['en', 'hi', 'gu', 'ta', 'fr'];
+        if (supported.includes(browserLang)) {
+            window.currentLocale = browserLang;
+            // Also try to guess country for India/Canada
+            if (browserLang === 'hi' || browserLang === 'gu' || browserLang === 'ta') window.currentCountry = 'India';
+            if (browserLang === 'fr') window.currentCountry = 'Canada';
+        }
     };
 
     // Language Selector UI
@@ -112,9 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const langDropdown = document.getElementById('lang-dropdown');
     
     if (langBtn) {
-        const langFlags = { "English": "🇺🇸 EN", "Hindi": "🇮🇳 HI", "Gujarati": "🇮🇳 GU" };
-        langBtn.innerHTML = (langFlags[window.currentLanguage] || "🇺🇸 EN") + ' ▼';
-        
         langBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             const isOpen = langDropdown.classList.toggle('active');
@@ -125,25 +191,18 @@ document.addEventListener('DOMContentLoaded', () => {
             langBtn.setAttribute('aria-expanded', 'false');
         });
 
-        langDropdown.querySelectorAll('a').forEach(opt => {
+        document.querySelectorAll('.country-opt').forEach(opt => {
             opt.addEventListener('click', (e) => {
-                e.preventDefault();
-                const langName = e.target.getAttribute('data-lang');
-                
-                window.currentLanguage = langName;
-                localStorage.setItem('language', langName);
-                langBtn.innerHTML = langFlags[langName] + ' ▼';
-                langDropdown.classList.remove('active');
-                langBtn.setAttribute('aria-expanded', 'false');
-                
-                applyTranslations(langName);
-                renderSuggestedPrompts();
+                e.stopPropagation();
+                setCountry(e.target.getAttribute('data-country'));
             });
         });
     }
 
-    // Apply translations initially
-    applyTranslations(window.currentLanguage);
+    // Initialize
+    detectLocale();
+    applyTranslations(window.currentLocale);
+    updateSelectorUI();
 
     // Chat Panel Toggle
     const chatFab = document.getElementById('chat-fab');
@@ -189,7 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 chatHistory = [];
                 chatBox.innerHTML = '';
                 // Add initial welcome
-                createMessage('system', window.getTranslation('chat_welcome', window.currentLanguage), false);
+                const welcomeMsg = window.translations[window.currentLocale]?.chat_welcome || window.translations['en'].chat_welcome;
+                createMessage('system', welcomeMsg, false);
                 renderSuggestedPrompts();
                 window.showToast("Conversation reset.", "success");
             }
@@ -316,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const promptKeys = ['prompt_next_election', 'prompt_register', 'prompt_candidates', 'prompt_id'];
         promptKeys.forEach(key => {
-            const text = window.getTranslation(key, window.currentLanguage);
+            const text = window.translations[window.currentLocale]?.[key] || window.translations['en'][key];
             if (!text) return;
 
             const chip = document.createElement('button');
@@ -389,7 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         messages: apiMessages, 
-                        locale: localeMap[window.currentLanguage] || "en" 
+                        locale: window.currentLocale 
                     }),
                     timeout: 15000 // 15 seconds max for chat response
                 });
@@ -549,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetchWithTimeout(`${API_BASE_URL}/api/v1/compare/`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ candidate1: c1, candidate2: c2, language: window.currentLanguage }),
+                    body: JSON.stringify({ candidate1: c1, candidate2: c2, locale: window.currentLocale }),
                     timeout: 25000 // Comparison takes longer
                 });
 

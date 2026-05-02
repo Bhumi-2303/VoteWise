@@ -133,12 +133,36 @@ button, .btn { font-family: var(--font-sans); cursor: pointer; transition: var(-
 .language-selector { position: relative; }
 .lang-dropdown {
   position: absolute; top: 120%; right: 0; border-radius: var(--radius-md);
-  padding: 0.5rem; display: flex; flex-direction: column; gap: 0.25rem;
-  min-width: 150px; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: var(--transition);
+  padding: 1rem; display: flex; flex-direction: column; gap: 1rem;
+  min-width: 220px; opacity: 0; pointer-events: none; transform: translateY(-10px); transition: var(--transition);
+  z-index: 1001;
 }
 .lang-dropdown.active { opacity: 1; pointer-events: auto; transform: translateY(0); }
-.lang-dropdown a { padding: 0.5rem 1rem; text-decoration: none; color: var(--text-main); border-radius: 6px; transition: var(--transition); }
-.lang-dropdown a:hover { background: var(--primary-glow); }
+
+.selector-section { display: flex; flex-direction: column; gap: 0.5rem; }
+.selector-section small { text-transform: uppercase; font-size: 0.65rem; font-weight: 700; color: var(--primary); letter-spacing: 0.05em; }
+
+.country-options { display: flex; gap: 0.5rem; }
+.country-opt { 
+    background: var(--bg); border: 1px solid var(--border); 
+    width: 40px; height: 40px; border-radius: 8px; 
+    display: flex; align-items: center; justify-content: center; 
+    font-size: 1.25rem; transition: var(--transition); 
+}
+.country-opt:hover { background: var(--surface-hover); border-color: var(--primary); }
+.country-opt.active { background: var(--primary-glow); border-color: var(--primary); transform: scale(1.05); }
+
+.selector-divider { height: 1px; background: var(--border); width: 100%; }
+
+.language-options { display: flex; flex-direction: column; gap: 0.25rem; }
+.lang-opt { 
+    padding: 0.5rem 0.75rem; border-radius: 6px; 
+    text-align: left; background: transparent; border: none; 
+    color: var(--text-main); font-size: 0.9rem; font-weight: 500;
+    transition: var(--transition);
+}
+.lang-opt:hover { background: var(--primary-glow); color: var(--primary); }
+.lang-opt.active { background: var(--primary); color: white; }
 
 .mobile-menu-btn { display: none; background: transparent; border: none; font-size: 1.5rem; color: var(--text-main); }
 .mobile-menu {

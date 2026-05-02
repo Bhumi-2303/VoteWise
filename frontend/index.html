@@ -41,11 +41,26 @@
                 <button class="icon-btn" id="dark-mode-btn" title="Toggle Dark Mode" aria-label="Toggle Dark Mode">🌙</button>
             </div>
             <div class="language-selector">
-                <button id="lang-btn" class="glass-btn" aria-haspopup="true" aria-expanded="false">🇺🇸 EN ▼</button>
+                <button id="lang-btn" class="glass-btn" aria-haspopup="true" aria-expanded="false">
+                    <span id="current-country-flag">🇺🇸</span> <span id="current-lang-code">EN</span> ▼
+                </button>
                 <div class="lang-dropdown glass" id="lang-dropdown" role="menu">
-                    <a href="#" data-lang="English" role="menuitem">🇺🇸 English</a>
-                    <a href="#" data-lang="Hindi" role="menuitem">🇮🇳 Hindi</a>
-                    <a href="#" data-lang="Gujarati" role="menuitem">🇮🇳 Gujarati</a>
+                    <div class="selector-section">
+                        <small>Select Country</small>
+                        <div class="country-options">
+                            <button class="country-opt active" data-country="USA" title="USA">🇺🇸</button>
+                            <button class="country-opt" data-country="India" title="India">🇮🇳</button>
+                            <button class="country-opt" data-country="UK" title="UK">🇬🇧</button>
+                            <button class="country-opt" data-country="Canada" title="Canada">🇨🇦</button>
+                        </div>
+                    </div>
+                    <div class="selector-divider"></div>
+                    <div class="selector-section">
+                        <small>Select Language</small>
+                        <div id="language-options" class="language-options">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -245,12 +260,12 @@
             <div class="footer-logo">VoteWise<span class="text-primary">AI</span></div>
             <p data-i18n="footer_copyright">&copy; 2026. Empowering Democracy through Technology.</p>
             <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--text-muted);">
-                <span data-i18n="footer_version">Deployed Version: v1.1.0 | Backend: </span><span id="backend-version-display" role="status" aria-live="polite">Connecting...</span>
+                <span data-i18n="footer_version">Deployed Version: v1.1.0</span> <span id="backend-version-display" role="status" aria-live="polite"></span>
             </div>
         </div>
     </footer>
 
-    <script src="js/i18n.js"></script>
+    <script src="js/translations.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
