@@ -237,6 +237,36 @@ button, .btn { font-family: var(--font-sans); cursor: pointer; transition: var(-
 
 @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
+/* Suggested Prompts */
+.suggested-prompts {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  overflow-x: auto;
+  scrollbar-width: none; /* Hide scrollbar for Firefox */
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+}
+.suggested-prompts::-webkit-scrollbar { display: none; } /* Hide scrollbar for Chrome/Safari */
+
+.prompt-chip {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.prompt-chip:hover {
+  border-color: var(--primary);
+  background: var(--primary-glow);
+  transform: translateY(-2px);
+}
+
 /* Typing indicator */
 .typing { display: flex; gap: 4px; padding: 0.5rem; }
 .typing span { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; animation: blink 1.4s infinite both; }

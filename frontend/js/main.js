@@ -137,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 langBtn.setAttribute('aria-expanded', 'false');
                 
                 applyTranslations(langName);
+                renderSuggestedPrompts();
             });
         });
     }
@@ -286,6 +287,31 @@ document.addEventListener('DOMContentLoaded', () => {
         return bubble;
     };
 
+    const renderSuggestedPrompts = () => {
+        const container = document.getElementById('suggested-prompts');
+        if (!container) return;
+
+        if (chatHistory.length > 0) {
+            container.classList.add('hidden');
+            return;
+        }
+
+        container.innerHTML = '';
+        container.classList.remove('hidden');
+
+        const promptKeys = ['prompt_vote_where', 'prompt_docs', 'prompt_compare', 'prompt_ballot'];
+        promptKeys.forEach(key => {
+            const text = window.getTranslation(key, window.currentLanguage);
+            if (!text) return;
+
+            const chip = document.createElement('button');
+            chip.className = 'prompt-chip fade-in-up';
+            chip.textContent = text;
+            chip.onclick = () => sendMessage(text);
+            container.appendChild(chip);
+        });
+    };
+
     // Initialize chat
     const initChat = () => {
         // Clear default welcome message if there is history
@@ -293,6 +319,7 @@ document.addEventListener('DOMContentLoaded', () => {
             chatBox.innerHTML = '';
             chatHistory.forEach(msg => createMessage(msg.sender, msg.text, false));
         }
+        renderSuggestedPrompts();
     };
     initChat();
 
@@ -319,6 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isSending = true;
         sendBtn.disabled = true;
         userInput.disabled = true; // Prevent input while sending for mobile
+        
+        // Hide suggested prompts once interaction starts
+        document.getElementById('suggested-prompts')?.classList.add('hidden');
         
         addTypingIndicator();
 

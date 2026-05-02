@@ -46,7 +46,11 @@ const translations = {
         "lookup_placeholder": "Enter ZIP or Address...",
         "lookup_btn": "Search",
         "lookup_elections_heading": "Upcoming Elections",
-        "lookup_reps_heading": "Your Representatives"
+        "lookup_reps_heading": "Your Representatives",
+        "prompt_vote_where": "Where do I vote?",
+        "prompt_docs": "What documents do I need?",
+        "prompt_compare": "Compare two candidates",
+        "prompt_ballot": "Explain ballot measures"
     },
     "Hindi": {
         "nav_features": "सुविधाएँ",
@@ -95,7 +99,11 @@ const translations = {
         "lookup_placeholder": "पिन कोड या पता दर्ज करें...",
         "lookup_btn": "खोजें",
         "lookup_elections_heading": "आगामी चुनाव",
-        "lookup_reps_heading": "आपके प्रतिनिधि"
+        "lookup_reps_heading": "आपके प्रतिनिधि",
+        "prompt_vote_where": "मैं कहाँ वोट दूँ?",
+        "prompt_docs": "मुझे किन दस्तावेजों की आवश्यकता है?",
+        "prompt_compare": "दो उम्मीदवारों की तुलना करें",
+        "prompt_ballot": "मतपत्र उपायों की व्याख्या करें"
     },
     "Gujarati": {
         "nav_features": "સુવિધાઓ",
@@ -144,7 +152,11 @@ const translations = {
         "lookup_placeholder": "પિન કોડ અથવા સરનામું દાખલ કરો...",
         "lookup_btn": "શોધો",
         "lookup_elections_heading": "આગામી ચૂંટણીઓ",
-        "lookup_reps_heading": "તમારા પ્રતિનિધિઓ"
+        "lookup_reps_heading": "તમારા પ્રતિનિધિઓ",
+        "prompt_vote_where": "હું ક્યાં મત આપી શકું?",
+        "prompt_docs": "મારે કયા દસ્તાવેજોની જરૂર છે?",
+        "prompt_compare": "બે ઉમેદવારોની સરખામણી કરો",
+        "prompt_ballot": "બેલેટ માપદંડો સમજાવો"
     }
 };
 
