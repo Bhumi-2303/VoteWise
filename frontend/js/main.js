@@ -92,12 +92,37 @@ document.addEventListener('DOMContentLoaded', () => {
     if(closeChat) closeChat.addEventListener('click', () => chatPanel.classList.remove('active'));
     if(heroChatBtn) heroChatBtn.addEventListener('click', (e) => { e.preventDefault(); openChat(); });
 
-    // Chat API Logic
+    // Chat & API Configuration
     const chatBox = document.getElementById('chat-box');
     const sendBtn = document.getElementById('send-btn');
     
-    const API_BASE_URL = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:8000' : 'https://votewise-backend-74clgpdhmq-uc.a.run.app';
-    const API_URL = `${API_BASE_URL}/api/v1/chat/`;
+    // Production-safe dynamic API base URL detection
+    const API_BASE_URL = window.API_BASE_URL || 
+        ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+            ? 'http://localhost:8000' 
+            : 'https://votewise-backend-74clgpdhmq-uc.a.run.app');
+            
+    const CHAT_API_URL = `${API_BASE_URL}/api/v1/chat/`;
+    const VERSION_API_URL = `${API_BASE_URL}/api/v1/version`;
+
+    // Utility: Native fetch with timeout using AbortController to prevent memory leaks and infinite hanging
+    const fetchWithTimeout = async (resource, options = {}) => {
+        const { timeout = 8000 } = options;
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), timeout);
+
+        try {
+            const response = await fetch(resource, {
+                ...options,
+                signal: controller.signal
+            });
+            clearTimeout(id);
+            return response;
+        } catch (error) {
+            clearTimeout(id);
+            throw error;
+        }
+    };
 
     const createMessage = (sender, text) => {
         const div = document.createElement('div');
@@ -138,9 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = text.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         
-        let i = 0;
-        const textNodes = Array.from(tempDiv.childNodes);
-        
         // Fast instant display for better UX since streaming isn't fully supported on backend yet
         element.innerHTML = tempDiv.innerHTML;
         chatBox.scrollTop = chatBox.scrollHeight;
@@ -160,12 +182,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxAttempts = 2;
         let success = false;
 
-        while(attempts < maxAttempts && !success) {
+        while (attempts < maxAttempts && !success) {
             try {
-                const response = await fetch(API_URL, {
+                // Using fetchWithTimeout to prevent UI freeze
+                const response = await fetchWithTimeout(CHAT_API_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text, language: window.currentLanguage })
+                    body: JSON.stringify({ message: text, language: window.currentLanguage }),
+                    timeout: 15000 // 15 seconds max for chat response
                 });
 
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -179,9 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) {
                 attempts++;
                 if (attempts >= maxAttempts) {
-                    console.error("Chat Error:", error);
+                    if (window.console && console.error) {
+                        console.error("Chat API Error:", error.message || error);
+                    }
                     document.getElementById('typing-indicator')?.remove();
-                    createMessage('system', "⚠️ Service unavailable. Please try again later.");
+                    createMessage('system', "⚠️ **Connection Error:** Our AI backend is currently unreachable. Please check your connection or try again later.");
+                } else {
+                    // Exponential backoff before retry (1s, 2s, ...)
+                    await new Promise(resolve => setTimeout(resolve, 1000 * attempts));
                 }
             }
         }
@@ -190,23 +219,74 @@ document.addEventListener('DOMContentLoaded', () => {
         userInput.focus();
     };
 
-    if(sendBtn) sendBtn.addEventListener('click', sendMessage);
-    if(userInput) {
+    if (sendBtn) sendBtn.addEventListener('click', sendMessage);
+    if (userInput) {
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
         });
     }
 
-    // Fetch Backend Version
+    // Health Check & Version Fetch System
     const versionDisplay = document.getElementById('backend-version-display');
+    
+    const updateHealthUI = (state, data = null) => {
+        if (!versionDisplay) return;
+        
+        if (state === 'connected' && data) {
+            versionDisplay.innerHTML = `v${data.version || 'Unknown'} <span style="color: #10b981;">(Connected 🟢)</span>`;
+        } else if (state === 'degraded' && data) {
+            versionDisplay.innerHTML = `v${data.version || 'Unknown'} <span style="color: #f59e0b;">(Degraded 🟡)</span>`;
+        } else if (state === 'offline') {
+            versionDisplay.innerHTML = `<span style="color: #ef4444;">Offline 🔴</span>`;
+        }
+    };
+
+    const initializeHealthCheck = async () => {
+        let attempts = 0;
+        const maxRetries = 3;
+        const baseDelay = 1000;
+
+        while (attempts < maxRetries) {
+            try {
+                const startTime = performance.now();
+                // 5 seconds timeout for health check
+                const response = await fetchWithTimeout(VERSION_API_URL, { timeout: 5000 });
+                
+                if (!response.ok) throw new Error(`HTTP Error: ${response.status}`);
+                
+                const data = await response.json();
+                const duration = performance.now() - startTime;
+                
+                if (duration > 2000 || attempts > 0) {
+                    updateHealthUI('degraded', data);
+                } else {
+                    updateHealthUI('connected', data);
+                }
+                
+                if (window.console && console.info) {
+                    console.info('Backend connected successfully.');
+                }
+                return; // Success, exit
+                
+            } catch (error) {
+                attempts++;
+                if (window.console && console.warn) {
+                    console.warn(`Health check attempt ${attempts} failed:`, error.message || error);
+                }
+                
+                if (attempts >= maxRetries) {
+                    updateHealthUI('offline');
+                    return;
+                }
+                
+                // Exponential backoff
+                const delay = baseDelay * Math.pow(2, attempts - 1);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+    };
+
     if (versionDisplay) {
-        fetch(`${API_BASE_URL}/api/v1/version`)
-            .then(res => res.json())
-            .then(data => {
-                versionDisplay.textContent = `v${data.version} (${data.environment})`;
-            })
-            .catch(() => {
-                versionDisplay.textContent = 'Disconnected';
-            });
+        initializeHealthCheck();
     }
 });
