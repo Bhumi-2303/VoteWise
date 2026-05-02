@@ -1,4 +1,5 @@
-window.currentLanguage = "English";
+// Language Management Initialization
+window.currentLanguage = localStorage.getItem('language') || "English";
 
 document.addEventListener('DOMContentLoaded', () => {
     // Reveal Animations
@@ -48,10 +49,34 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Language Selector
+    // Language Management & Translations
+    const applyTranslations = (lang) => {
+        if (!window.getTranslation) return; // Fallback if i18n.js is not loaded
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            const translation = window.getTranslation(key, lang);
+            if (translation) el.innerHTML = translation;
+        });
+
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            const translation = window.getTranslation(key, lang);
+            if (translation) el.setAttribute('placeholder', translation);
+        });
+        
+        const htmlLangMap = { "English": "en", "Hindi": "hi", "Gujarati": "gu" };
+        document.documentElement.lang = htmlLangMap[lang] || "en";
+    };
+
+    // Language Selector UI
     const langBtn = document.getElementById('lang-btn');
     const langDropdown = document.getElementById('lang-dropdown');
-    if(langBtn) {
+    
+    if (langBtn) {
+        const langFlags = { "English": "🇺🇸 EN", "Hindi": "🇮🇳 HI", "Gujarati": "🇮🇳 GU" };
+        langBtn.innerHTML = (langFlags[window.currentLanguage] || "🇺🇸 EN") + ' ▼';
+        
         langBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             langDropdown.classList.toggle('active');
@@ -62,12 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
             opt.addEventListener('click', (e) => {
                 e.preventDefault();
                 const langName = e.target.getAttribute('data-lang');
+                
                 window.currentLanguage = langName;
-                langBtn.innerHTML = e.target.textContent.split(' ')[0] + ' ' + langName.substring(0,2).toUpperCase() + ' ▼';
+                localStorage.setItem('language', langName);
+                langBtn.innerHTML = langFlags[langName] + ' ▼';
                 langDropdown.classList.remove('active');
+                
+                applyTranslations(langName);
             });
         });
     }
+
+    // Apply translations initially
+    applyTranslations(window.currentLanguage);
 
     // Chat Panel Toggle
     const chatFab = document.getElementById('chat-fab');
