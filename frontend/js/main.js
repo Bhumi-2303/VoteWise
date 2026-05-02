@@ -196,4 +196,17 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
         });
     }
+
+    // Fetch Backend Version
+    const versionDisplay = document.getElementById('backend-version-display');
+    if (versionDisplay) {
+        fetch(`${API_BASE_URL}/api/v1/version`)
+            .then(res => res.json())
+            .then(data => {
+                versionDisplay.textContent = `v${data.version} (${data.environment})`;
+            })
+            .catch(() => {
+                versionDisplay.textContent = 'Disconnected';
+            });
+    }
 });
