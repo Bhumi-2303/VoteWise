@@ -23,13 +23,17 @@ def create_app() -> FastAPI:
         version=settings.VERSION,
     )
 
-    # Configure CORS
+    # Configure CORS safely
+    origins = settings.CORS_ORIGINS
+    allow_all = "*" in origins
+
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
-        allow_credentials=True,
+        allow_origins=["*"] if allow_all else origins,
+        allow_credentials=not allow_all, # Browser blocks allow_credentials=True with allow_origins=["*"]
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["X-Process-Time"],
     )
 
     # Global timing middleware
@@ -48,7 +52,10 @@ def create_app() -> FastAPI:
     async def global_exception_handler(request: Request, exc: Exception):
         return JSONResponse(
             status_code=500,
-            content={"detail": "An unexpected error occurred. Please try again later."},
+            content={
+                "error": "InternalServerError", 
+                "message": "An unexpected error occurred. Please try again later."
+            },
         )
 
     # Root Endpoint

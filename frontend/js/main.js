@@ -192,7 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     timeout: 15000 // 15 seconds max for chat response
                 });
 
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                if (!response.ok) {
+                    let errMsg = `HTTP ${response.status}`;
+                    try {
+                        const errData = await response.json();
+                        if (errData.message) errMsg = errData.message;
+                    } catch (e) { /* Non-JSON response */ }
+                    throw new Error(errMsg);
+                }
                 
                 const data = await response.json();
                 document.getElementById('typing-indicator')?.remove();
