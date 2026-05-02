@@ -1,47 +1,24 @@
-# --- Build Stage ---
-FROM python:3.10-slim as builder
-
-WORKDIR /app
-
-ENV PYTHONDONTWRITEBYTECODE=1
-ENV PYTHONUNBUFFERED=1
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY requirements.txt .
-RUN pip install --user --no-cache-dir -r requirements.txt gunicorn
-
-# --- Final Stage ---
+# Use Python 3.10 slim image
 FROM python:3.10-slim
 
+# Set working directory
 WORKDIR /app
 
-# Create a non-root user for security
-RUN groupadd -r votewise && useradd -r -g votewise votewise
-USER votewise
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PORT=8080
 
-# Copy installed dependencies from builder
-COPY --from=builder /root/.local /home/votewise/.local
-ENV PATH=/home/votewise/.local/bin:$PATH
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
-COPY --chown=votewise:votewise backend/ /app/backend/
+COPY backend/ /app/
 
-ENV PORT=8080
-EXPOSE ${PORT}
+# Expose port
+EXPOSE 8080
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-  CMD curl -f http://localhost:${PORT}/health || exit 1
-
-# Production server configuration
-# Using gunicorn with uvicorn workers for process management
-CMD exec gunicorn backend.main:app \
-    --bind 0.0.0.0:${PORT} \
-    --workers 4 \
-    --worker-class uvicorn.workers.UvicornWorker \
-    --timeout 0 \
-    --access-logfile - \
-    --error-logfile -
+# Start the application using uvicorn as requested
+# Note: Since main.py is in the root of /app (copied from backend/), we use main:app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]

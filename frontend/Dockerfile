@@ -1,16 +1,14 @@
+# Use Nginx alpine for a small footprint
 FROM nginx:alpine
 
-# Use a non-root user for security (if possible with nginx image)
-# However, for simplicity in hackathon, we keep nginx defaults but optimize config
-
-# Copy custom nginx config
+# Copy custom nginx configuration that listens on 8080
 COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy frontend assets
+# Copy static frontend files to the default nginx serving directory
 COPY frontend/ /usr/share/nginx/html/
 
-# Cloud Run uses 8080 by default
+# Expose PORT 8080 as required by Cloud Run
 EXPOSE 8080
 
-# Overwrite default nginx command to listen on 8080
+# Start Nginx
 CMD ["nginx", "-g", "daemon off;"]
