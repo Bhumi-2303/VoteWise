@@ -23,7 +23,7 @@ async def debug_gemini():
         "api_key_loaded": has_key,
         "api_key_preview": key_preview,
         "sdk": "google-genai",
-        "current_configured_model": "gemini-1.5-flash"
+        "current_configured_model": "gemini-2.0-flash"
     }
 
 @router.get("/debug/models")

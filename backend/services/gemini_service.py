@@ -11,8 +11,8 @@ from backend.utils.logger import app_logger
 from backend.prompts import build_system_instruction, build_user_prompt
 
 # The supported model to use for chat responses
-# Using the stable 'gemini-1.5-flash' which is widely available across v1 and v1beta
-GEMINI_MODEL = "gemini-1.5-flash"
+# Based on diagnostics, gemini-2.0-flash is the primary available model for this account
+GEMINI_MODEL = "gemini-2.0-flash"
 
 # Lazily initialised client — created once when the first request arrives
 _client: genai.Client | None = None
