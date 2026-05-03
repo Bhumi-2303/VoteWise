@@ -30,6 +30,7 @@ const Navbar = () => {
     const savedLang = localStorage.getItem('votewise_lang');
     if (savedLang && translations[savedLang]) {
       setLanguageState(savedLang);
+      document.documentElement.lang = savedLang;
     }
     
     return () => window.removeEventListener('scroll', handleScroll);
@@ -43,6 +44,7 @@ const Navbar = () => {
   const setLanguage = (value: string) => {
     setLanguageState(value);
     localStorage.setItem('votewise_lang', value);
+    document.documentElement.lang = value;
   };
 
   const t = translations[language] || translations.en;

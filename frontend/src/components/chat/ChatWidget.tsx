@@ -92,6 +92,7 @@ const ChatWidget = () => {
                 onClick={() => setMessages([messages[0]])}
                 className="p-1.5 hover:bg-bg-primary/10 rounded-lg transition-colors"
                 title="Reset Conversation"
+                aria-label="Reset conversation"
               >
                 <RotateCcw size={18} />
               </button>
@@ -173,13 +174,14 @@ const ChatWidget = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask about candidates, voting..."
-                  aria-label="Type your civic question here"
+                  aria-label="Ask a civic question"
                   className="w-full pl-4 pr-12 py-3 bg-card-bg border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || isTyping}
                   className="absolute right-2 p-2 text-primary hover:bg-primary/10 rounded-lg disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                  aria-label="Send message"
                 >
                   <Send size={20} />
                 </button>
