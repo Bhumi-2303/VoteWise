@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel, Field
-from backend.services.gemini_service import get_ai_response
+from backend.services.ai import ai_service
 from backend.core.exceptions import CustomException
 import json
 import re
@@ -48,21 +48,29 @@ async def compare_candidates(request: CompareRequest):
     """
 
     try:
-        raw_response = await get_ai_response(contents=prompt)
+        raw_response = await ai_service.generate_text(
+            prompt=prompt,
+            system_instruction="You are a neutral political analyst. Always return strictly valid JSON.",
+            locale=request.language
+        )
         
-        # Clean up the response in case the model adds markdown code blocks
-        json_match = re.search(r'\{.*\}', raw_response, re.DOTALL)
+        # Clean up the response (remove markdown code blocks)
+        cleaned_response = re.sub(r'```json\s*|\s*```', '', raw_response).strip()
+        
+        json_match = re.search(r'\{.*\}', cleaned_response, re.DOTALL)
         if json_match:
-            data = json.loads(json_match.group())
-            return data
+            return json.loads(json_match.group())
         else:
-            # Fallback if parsing fails
+            app_logger.error(f"Comparison: Failed to parse JSON from response: {raw_response[:200]}...")
             raise ValueError("Invalid AI response format")
 
     except Exception as e:
-        print(f"Comparison Error: {str(e)}")
-        raise CustomException(
-            name="ComparisonError",
-            message="Failed to generate candidate comparison. Please try again with different names.",
-            status_code=500
-        )
+        app_logger.exception(f"Comparison Error: {str(e)}")
+        # Provide a high-quality static fallback for the comparison UI
+        return {
+            "candidates": [request.candidate1, request.candidate2],
+            "comparison": [
+                { "category": "Policy Stance", "c1": "Refer to official campaign site", "c2": "Refer to official campaign site" }
+            ],
+            "summary": "Our comparison engine is temporarily under maintenance. Please check back shortly for a full analysis."
+        }

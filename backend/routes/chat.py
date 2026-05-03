@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
-from backend.services.gemini_service import get_ai_response
+from backend.services.ai import ai_service
 from backend.utils.logger import app_logger
 
 router = APIRouter()
@@ -22,36 +22,30 @@ class ChatResponse(BaseModel):
 @router.post("/", response_model=ChatResponse)
 async def chat_endpoint(request: ChatRequest):
     """
-    Handle multi-turn chat messages, prepends a system instruction, and queries the AI service.
+    Handle multi-turn chat messages with robust error handling and fallback support.
     """
     try:
-        # Prepend the system prompt as requested
         system_instruction = (
             f"You are VoteWise AI, a civic education assistant. "
             f"Always respond in the language matching this locale: {request.locale}. "
             f"Be neutral, factual, and cite official sources."
         )
 
-        # Map frontend messages to Gemini SDK format (role and parts)
-        # Gemini SDK expects 'parts' to be a list of strings or other parts
-        gemini_messages = []
-        for msg in request.messages:
-            # Map 'assistant' role to 'model' for Gemini
-            role = "model" if msg.role == "assistant" else msg.role
-            gemini_messages.append({
-                "role": role,
-                "parts": [msg.content]
-            })
-
-        reply = await get_ai_response(contents=gemini_messages, system_instruction=system_instruction)
+        # Use the hardened AI service
+        # It handles its own internal fallbacks for Gemini failures
+        reply = await ai_service.get_chat_response(
+            messages=[m.dict() for m in request.messages],
+            system_instruction=system_instruction,
+            locale=request.locale
+        )
+        
         return ChatResponse(reply=reply)
     
     except Exception as e:
-        app_logger.error(f"Chat endpoint error: {str(e)}")
-        return JSONResponse(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={
-                "error": True,
-                "message": f"Failed to process the chat message: {str(e)}"
-            }
+        app_logger.exception(f"Chat Route Error: {str(e)}")
+        # Even in a total failure, we return a successful schema with a safe message
+        # This prevents frontend crashes
+        return ChatResponse(
+            reply="I'm sorry, I'm having trouble connecting to my knowledge base right now. Please try again in a moment.",
+            status="error"
         )
