@@ -18,13 +18,13 @@ const BentoItem = ({ title, description, icon: Icon, className, delay = 0 }: Ben
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
     transition={{ duration: 0.5, delay }}
-    className={`p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:shadow-xl hover:border-primary/20 transition-all group ${className}`}
+    className={`p-8 rounded-3xl border border-card-border bg-card-bg hover:shadow-xl hover:border-primary/20 transition-all group ${className}`}
   >
-    <div className="w-12 h-12 bg-zinc-50 dark:bg-zinc-800 rounded-xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
+    <div className="w-12 h-12 bg-card-bg rounded-xl flex items-center justify-center text-primary mb-6 group-hover:scale-110 transition-transform">
       <Icon size={24} />
     </div>
-    <h3 className="text-xl font-bold text-text-primary dark:text-white mb-3">{title}</h3>
-    <p className="text-text-secondary dark:text-zinc-400 leading-relaxed text-sm">{description}</p>
+    <h3 className="text-xl font-bold text-text-primary mb-3">{title}</h3>
+    <p className="text-text-secondary leading-relaxed text-sm">{description}</p>
   </motion.div>
 );
 
@@ -32,10 +32,10 @@ const BentoGrid = () => {
   return (
     <section id="features" className="py-24 max-w-7xl mx-auto px-6">
       <div className="text-center mb-16">
-        <h2 className="text-4xl font-extrabold text-text-primary dark:text-white mb-4">
+        <h2 className="text-4xl font-extrabold text-text-primary mb-4">
           Everything You Need to Vote <span className="text-primary">Wise.</span>
         </h2>
-        <p className="text-text-secondary dark:text-zinc-400 max-w-2xl mx-auto">
+        <p className="text-text-secondary max-w-2xl mx-auto">
           We combine real-time official data with neutral AI analysis to help you 
           make the most informed decision at the ballot box.
         </p>

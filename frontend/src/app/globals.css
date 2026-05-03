@@ -1,56 +1,68 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  
   --color-primary: #1A73E8;
   --color-primary-dark: #1557B0;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #F8F9FA;
-  --color-surface-3: #F1F3F4;
-  --color-text-primary: #202124;
-  --color-text-secondary: #5F6368;
-  --color-text-hint: #9AA0A6;
-  --color-border: #DADCE0;
-  --color-success: #1E8E3E;
-  --color-warning: #F29900;
-  --color-error: #D93025;
 
-  --radius-md: 8px;
-  --radius-lg: 16px;
-  
+  --color-bg-primary: var(--bg-primary);
+  --color-bg-secondary: var(--bg-secondary);
+  --image-bg-hero: var(--bg-hero);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-on-hero: var(--text-on-hero);
+  --color-card-bg: var(--card-bg);
+  --color-card-border: var(--card-border);
+  --color-nav-bg: var(--nav-bg);
+  --color-nav-text: var(--nav-text);
+  --color-btn-primary-bg: var(--btn-primary-bg);
+  --color-btn-primary-text: var(--btn-primary-text);
+  --color-chat-bg: var(--chat-bg);
+  --color-chat-user-bubble: var(--chat-user-bubble);
+  --color-chat-user-text: var(--chat-user-text);
+  --color-chat-ai-bubble: var(--chat-ai-bubble);
+  --color-chat-ai-text: var(--chat-ai-text);
+
   --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
-  --background: #FFFFFF;
-  --foreground: #202124;
-  
-  --color-primary: #1A73E8;
-  --color-surface: #FFFFFF;
-  --color-surface-2: #F8F9FA;
-  --color-surface-3: #F1F3F4;
-  --color-text-primary: #202124;
-  --color-text-secondary: #5F6368;
-  --color-border: #DADCE0;
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F8F9FA;
+  --bg-hero: linear-gradient(135deg, #1A73E8 0%, #0D47A1 100%);
+  --text-primary: #202124;
+  --text-secondary: #5F6368;
+  --text-on-hero: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --card-border: #DADCE0;
+  --nav-bg: rgba(255,255,255,0.95);
+  --nav-text: #202124;
+  --btn-primary-bg: #1A73E8;
+  --btn-primary-text: #FFFFFF;
+  --chat-bg: #FFFFFF;
+  --chat-user-bubble: #1A73E8;
+  --chat-user-text: #FFFFFF;
+  --chat-ai-bubble: #F1F3F4;
+  --chat-ai-text: #202124;
 }
 
-.dark {
-  --background: #202124;
-  --foreground: #E8EAED;
-  
-  --color-surface: #202124;
-  --color-surface-2: #292A2D;
-  --color-surface-3: #35363A;
-  --color-text-primary: #E8EAED;
-  --color-text-secondary: #9AA0A6;
-  --color-border: #5F6368;
+[data-theme="dark"], .dark {
+  --bg-primary: #202124;
+  --bg-secondary: #292A2D;
+  --bg-hero: linear-gradient(135deg, #1A1A2E 0%, #16213E 100%);
+  --text-primary: #E8EAED;
+  --text-secondary: #9AA0A6;
+  --card-bg: #292A2D;
+  --card-border: #5F6368;
+  --nav-bg: rgba(32,33,36,0.95);
+  --nav-text: #E8EAED;
+  --chat-bg: #292A2D;
+  --chat-ai-bubble: #35363A;
+  --chat-ai-text: #E8EAED;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg-primary);
+  color: var(--text-primary);
   font-family: var(--font-sans);
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
@@ -63,19 +75,19 @@ body {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-surface-2);
+  background: var(--bg-secondary);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-text-hint);
+  background: var(--card-border);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-text-secondary);
+  background: var(--text-secondary);
 }
 
 /* Utilities */
 .glass {
-  background: rgba(var(--color-surface), 0.7);
+  background: var(--nav-bg);
   backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--card-border);
 }

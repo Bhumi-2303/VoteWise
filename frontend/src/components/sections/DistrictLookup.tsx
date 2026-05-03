@@ -33,15 +33,15 @@ const DistrictLookup = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
         <div>
           <h2 className="text-4xl font-extrabold mb-6">Know Your <span className="text-primary">Constituency.</span></h2>
-          <p className="text-lg text-text-secondary dark:text-zinc-400 mb-8 leading-relaxed">
+          <p className="text-lg text-text-secondary mb-8 leading-relaxed">
             Enter your address or ZIP code to find your current representatives, 
             upcoming elections, and official polling locations. We use the 
             Google Civic Information API to ensure 100% accuracy.
           </p>
           
           <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-              <div className="w-10 h-10 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center text-primary shadow-sm">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-card-border">
+              <div className="w-10 h-10 bg-card-bg rounded-xl flex items-center justify-center text-primary shadow-sm">
                 <Landmark aria-hidden="true" size={20} />
               </div>
               <div>
@@ -49,8 +49,8 @@ const DistrictLookup = () => {
                 <p className="text-xs text-text-secondary">Direct connection to official election databases.</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-              <div className="w-10 h-10 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center text-primary shadow-sm">
+            <div className="flex items-center gap-4 p-4 rounded-2xl bg-bg-secondary border border-card-border">
+              <div className="w-10 h-10 bg-card-bg rounded-xl flex items-center justify-center text-primary shadow-sm">
                 <Calendar aria-hidden="true" size={20} />
               </div>
               <div>
@@ -61,7 +61,7 @@ const DistrictLookup = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
+        <div className="bg-card-bg p-8 rounded-[40px] border border-card-border shadow-xl relative overflow-hidden">
           <div className="relative z-10">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
               <MapPin aria-hidden="true" size={24} className="text-primary" />
@@ -71,14 +71,14 @@ const DistrictLookup = () => {
             <div className="space-y-4">
               <div className="relative">
                 <label htmlFor="address-input" className="sr-only">Enter Address or ZIP Code</label>
-                <Search aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <Search aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                 <input 
                   id="address-input"
                   type="text" 
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="Enter Address or ZIP Code..."
-                  className="w-full pl-12 pr-4 py-4 bg-zinc-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-card-bg border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
               <button 
@@ -95,7 +95,7 @@ const DistrictLookup = () => {
                 <motion.div 
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
-                  className="mt-10 pt-10 border-t border-zinc-100 dark:border-zinc-800 space-y-6"
+                  className="mt-10 pt-10 border-t border-card-border space-y-6"
                 >
                   <div>
                     <span className="text-[10px] font-bold uppercase text-primary tracking-widest block mb-2">Current District</span>
@@ -103,13 +103,13 @@ const DistrictLookup = () => {
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50">
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Upcoming Election</span>
+                    <div className="p-4 rounded-2xl bg-card-bg/50">
+                      <span className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Upcoming Election</span>
                       <p className="text-sm font-bold">{data.elections[0].name}</p>
                       <p className="text-xs text-text-secondary">{data.elections[0].date}</p>
                     </div>
-                    <div className="p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50">
-                      <span className="text-[10px] font-bold text-zinc-400 uppercase block mb-1">Primary Rep</span>
+                    <div className="p-4 rounded-2xl bg-card-bg/50">
+                      <span className="text-[10px] font-bold text-text-secondary uppercase block mb-1">Primary Rep</span>
                       <p className="text-sm font-bold">{data.representatives[0].name}</p>
                       <p className="text-xs text-text-secondary">{data.representatives[0].office}</p>
                     </div>

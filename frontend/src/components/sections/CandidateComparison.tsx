@@ -25,49 +25,49 @@ const CandidateComparison = () => {
   };
 
   return (
-    <section id="compare" className="py-24 bg-zinc-50 dark:bg-zinc-950/50">
+    <section id="compare" className="py-24 bg-bg-secondary">
       <div className="max-w-4xl mx-auto px-6">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold mb-4">Neutral Candidate Comparison</h2>
-          <p className="text-text-secondary dark:text-zinc-400">
+          <p className="text-text-secondary">
             Compare two candidates side-by-side. Our AI scans official records and 
             verified statements to provide an objective breakdown.
           </p>
         </div>
 
         {/* Inputs */}
-        <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm mb-8">
+        <div className="bg-card-bg p-8 rounded-3xl border border-card-border shadow-sm mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1 w-full space-y-2">
               <label htmlFor="c1-input" className="text-xs font-bold uppercase tracking-wider text-primary">Candidate A name</label>
               <div className="relative">
-                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                 <input 
                   id="c1-input"
                   type="text" 
                   value={c1}
                   onChange={(e) => setC1(e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full pl-12 pr-4 py-4 bg-zinc-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-card-bg border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
             </div>
 
-            <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-400 hidden md:block">
+            <div className="p-3 bg-card-bg rounded-full text-text-secondary hidden md:block">
               <ArrowRightLeft aria-hidden="true" size={20} />
             </div>
 
             <div className="flex-1 w-full space-y-2">
               <label htmlFor="c2-input" className="text-xs font-bold uppercase tracking-wider text-primary">Candidate B name</label>
               <div className="relative">
-                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-text-secondary" size={18} />
                 <input 
                   id="c2-input"
                   type="text" 
                   value={c2}
                   onChange={(e) => setC2(e.target.value)}
                   placeholder="Enter name..."
-                  className="w-full pl-12 pr-4 py-4 bg-zinc-50 dark:bg-zinc-800 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
+                  className="w-full pl-12 pr-4 py-4 bg-card-bg border-none rounded-2xl focus:ring-2 focus:ring-primary/20 outline-none"
                 />
               </div>
             </div>
@@ -99,16 +99,16 @@ const CandidateComparison = () => {
             >
               {results.comparison.map((item: any, i: number) => (
                 <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-center">
-                    <div className="text-sm font-medium text-text-primary dark:text-white">{item.v1}</div>
+                  <div className="bg-card-bg p-6 rounded-2xl border border-card-border flex items-center justify-center text-center">
+                    <div className="text-sm font-medium text-text-primary">{item.v1}</div>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full text-[10px] font-bold uppercase tracking-tighter text-zinc-500">
+                    <span className="px-3 py-1 bg-card-bg rounded-full text-[10px] font-bold uppercase tracking-tighter text-text-secondary">
                       {item.category}
                     </span>
                   </div>
-                  <div className="bg-white dark:bg-zinc-900 p-6 rounded-2xl border border-zinc-200 dark:border-zinc-800 flex items-center justify-center text-center">
-                    <div className="text-sm font-medium text-text-primary dark:text-white">{item.v2}</div>
+                  <div className="bg-card-bg p-6 rounded-2xl border border-card-border flex items-center justify-center text-center">
+                    <div className="text-sm font-medium text-text-primary">{item.v2}</div>
                   </div>
                 </div>
               ))}
@@ -117,7 +117,7 @@ const CandidateComparison = () => {
                 <Info aria-hidden="true" className="text-primary shrink-0" size={24} />
                 <div>
                   <h4 className="font-bold text-primary mb-1">AI Trust Indicator</h4>
-                  <p className="text-xs text-text-secondary dark:text-zinc-400">
+                  <p className="text-xs text-text-secondary">
                     This comparison was generated based on verified records from the FEC and official candidate sites. 
                     No editorial bias was applied to these data points.
                   </p>
