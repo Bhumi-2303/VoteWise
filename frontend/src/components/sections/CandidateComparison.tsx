@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, ArrowRightLeft, User, Info, CheckCircle2 } from 'lucide-react';
+import { Search, ArrowRightLeft, User, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { compareCandidates } from '@/lib/api';
+import { compareCandidates, ComparisonResponse, ComparisonItem } from '@/lib/api';
 
 const CandidateComparison = () => {
   const [c1, setC1] = useState('');
   const [c2, setC2] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<ComparisonResponse | null>(null);
 
   const handleCompare = async () => {
     if (!c1 || !c2) return;
@@ -97,7 +97,7 @@ const CandidateComparison = () => {
               animate={{ opacity: 1, y: 0 }}
               className="space-y-4"
             >
-              {results.comparison.map((item: any, i: number) => (
+              {results.comparison.map((item: ComparisonItem, i: number) => (
                 <div key={i} className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="bg-card-bg p-6 rounded-2xl border border-card-border flex items-center justify-center text-center">
                     <div className="text-sm font-medium text-text-primary">{item.v1}</div>

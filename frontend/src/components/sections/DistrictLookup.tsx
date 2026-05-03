@@ -1,14 +1,14 @@
 "use client";
 
 import React, { useState } from 'react';
-import { MapPin, Search, Calendar, Landmark, Info } from 'lucide-react';
+import { MapPin, Search, Calendar, Landmark } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { lookupDistrict } from '@/lib/api';
+import { lookupDistrict, Election, Representative } from '@/lib/api';
 
 const DistrictLookup = () => {
   const [address, setAddress] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{district: string, elections: Election[], representatives: Representative[]} | null>(null);
 
   const handleLookup = async () => {
     if (!address) return;

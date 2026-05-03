@@ -29,6 +29,7 @@ const Navbar = () => {
     // Load language and theme from storage
     const savedLang = localStorage.getItem('votewise_lang');
     if (savedLang && translations[savedLang]) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLanguageState(savedLang);
       document.documentElement.lang = savedLang;
     }

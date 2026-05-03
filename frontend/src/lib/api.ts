@@ -16,7 +16,7 @@ export interface Message {
 export interface ChatResponse {
   reply: string;
   status?: string;
-  context?: any;
+  context?: unknown;
 }
 
 export interface ComparisonItem {
@@ -46,7 +46,7 @@ export interface DistrictResponse {
   address: string;
   representatives: Representative[];
   elections: Election[];
-  polling_locations?: any[];
+  polling_locations?: unknown[];
 }
 
 export interface ApiError {
@@ -54,7 +54,19 @@ export interface ApiError {
   status?: number;
 }
 
-// --- Internal Helper ---
+// --- Internal Helpers ---
+
+function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+function isStringArray(value: unknown): value is string[] {
+  return Array.isArray(value) && value.every(isString);
+}
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   // Strip trailing slashes to avoid issues, then append properly if needed.
@@ -86,24 +98,25 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
         const errorData = await response.json();
         if (errorData.message) errorMessage = errorData.message;
         if (errorData.detail) errorMessage = Array.isArray(errorData.detail) ? errorData.detail[0].msg : errorData.detail;
-      } catch (e) {
+      } catch (_e: unknown) {
         // Not a JSON error, keep default
       }
       throw { message: errorMessage, status: response.status } as ApiError;
     }
 
     return await response.json();
-  } catch (error: any) {
+  } catch (error: unknown) {
     clearTimeout(timeoutId);
-    if (error.name === 'AbortError') {
+    if (error instanceof Error && error.name === 'AbortError') {
       throw { message: "Request timed out. Please check your connection and try again.", status: 408 };
     }
     // If it's a TypeError related to fetch, it's likely offline or CORS
     if (error instanceof TypeError) {
        throw { message: "Network error. Please check if you are offline or if the backend is reachable.", status: 0 };
     }
-    if (error.status !== undefined) throw error;
-    throw { message: error.message || "Unknown error occurred.", status: 0 };
+    const err = error as Record<string, unknown>;
+    if (err && err.status !== undefined) throw error;
+    throw { message: (error instanceof Error ? error.message : "Unknown error occurred."), status: 0 };
   }
 }
 
@@ -150,22 +163,31 @@ export async function compareCandidates(candidate1: string, candidate2: string, 
   }
   
   // Actual backend route is POST /api/v1/compare/
-  const data = await apiRequest<any>("/api/v1/compare/", {
+  const data = await apiRequest<Record<string, unknown>>("/api/v1/compare/", {
     method: 'POST',
     body: JSON.stringify({ candidate1, candidate2, language }),
   });
 
-  // Map backend 'c1', 'c2' to frontend 'v1', 'v2'
-  const comparison = data.comparison?.map((item: any) => ({
-    category: item.category,
-    v1: item.c1,
-    v2: item.c2
-  })) || [];
+  // Safely normalize comparison
+  const rawComparison = Array.isArray(data.comparison) ? data.comparison : [];
+  const comparison: ComparisonItem[] = rawComparison
+    .filter(isObject)
+    .map((item) => ({
+      category: isString(item.category) ? item.category : "Unknown",
+      v1: isString(item.c1) ? item.c1 : (isString(item.v1) ? item.v1 : ""),
+      v2: isString(item.c2) ? item.c2 : (isString(item.v2) ? item.v2 : "")
+    }));
+
+  const candidates = isStringArray(data.candidates)
+    ? data.candidates
+    : [candidate1, candidate2];
+
+  const summary = isString(data.summary) ? data.summary : undefined;
 
   return {
-    candidates: data.candidates || [candidate1, candidate2],
+    candidates,
     comparison,
-    summary: data.summary
+    summary
   };
 }
 
@@ -178,21 +200,36 @@ export async function lookupDistrict(address: string): Promise<DistrictResponse>
   }
   
   // Actual backend route is GET /api/v1/lookup/?address=...
-  const data = await apiRequest<any>(`/api/v1/lookup/?address=${encodeURIComponent(address)}`, {
+  const data = await apiRequest<Record<string, unknown>>(`/api/v1/lookup/?address=${encodeURIComponent(address)}`, {
     method: 'GET',
   });
 
-  // Map backend title to frontend office
-  const representatives = data.representatives?.map((rep: any) => ({
-    name: rep.name,
-    office: rep.title || rep.office,
-    party: rep.party
-  })) || [];
+  // Safely normalize representatives
+  const rawReps = Array.isArray(data.representatives) ? data.representatives : [];
+  const representatives: Representative[] = rawReps
+    .filter(isObject)
+    .map((rep) => ({
+      name: isString(rep.name) ? rep.name : "Unknown",
+      office: isString(rep.title) ? rep.title : (isString(rep.office) ? rep.office : "Unknown"),
+      party: isString(rep.party) ? rep.party : "Unknown"
+    }));
+
+  // Safely normalize elections
+  const rawElections = Array.isArray(data.elections) ? data.elections : [];
+  const elections: Election[] = rawElections
+    .filter(isObject)
+    .map((el) => ({
+      name: isString(el.name) ? el.name : "Unknown Election",
+      date: isString(el.date) ? el.date : "TBD"
+    }));
+
+  const normalizedAddress = isString(data.address) ? data.address : address;
+  const polling_locations = Array.isArray(data.polling_locations) ? data.polling_locations : undefined;
 
   return {
-    address: data.address,
-    elections: data.elections || [],
+    address: normalizedAddress,
+    elections,
     representatives,
-    polling_locations: data.polling_locations
+    polling_locations
   };
 }

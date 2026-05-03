@@ -35,7 +35,7 @@ const ChatWidget = () => {
       const data = await sendChatMessage([...messages, userMsg], "en");
       const aiReply: Message = { role: 'assistant', content: data.reply };
       setMessages(prev => [...prev, aiReply]);
-    } catch (err: any) {
+    } catch (_err: unknown) {
       setMessages(prev => [...prev, { role: 'assistant', content: 'Something went wrong. Please try again.' }]);
     } finally {
       setIsTyping(false);
