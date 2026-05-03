@@ -1,14 +1,32 @@
-# Use Nginx alpine for a small footprint
-FROM nginx:alpine
+# --- Build Stage ---
+FROM node:18-alpine AS builder
 
-# Copy custom nginx configuration that listens on 8080
-COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+WORKDIR /app
 
-# Copy static frontend files to the default nginx serving directory
-COPY frontend/ /usr/share/nginx/html/
+# Copy package files for better caching
+COPY frontend/package*.json ./
+RUN npm install
 
-# Expose PORT 8080 as required by Cloud Run
+# Copy source and build
+COPY frontend/ .
+RUN npm run build
+
+# --- Final Stage ---
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Production environment
+ENV NODE_ENV=production
+ENV PORT=8080
+
+# Copy necessary files from builder
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/node_modules ./node_modules
+
 EXPOSE 8080
 
-# Start Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the Next.js server on port 8080
+CMD ["npm", "start", "--", "-p", "8080"]
