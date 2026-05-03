@@ -42,7 +42,7 @@ const DistrictLookup = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
               <div className="w-10 h-10 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center text-primary shadow-sm">
-                <Landmark size={20} />
+                <Landmark aria-hidden="true" size={20} />
               </div>
               <div>
                 <h4 className="font-bold text-sm">Real-time Data</h4>
@@ -51,7 +51,7 @@ const DistrictLookup = () => {
             </div>
             <div className="flex items-center gap-4 p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
               <div className="w-10 h-10 bg-white dark:bg-zinc-800 rounded-xl flex items-center justify-center text-primary shadow-sm">
-                <Calendar size={20} />
+                <Calendar aria-hidden="true" size={20} />
               </div>
               <div>
                 <h4 className="font-bold text-sm">Election Reminders</h4>
@@ -64,14 +64,16 @@ const DistrictLookup = () => {
         <div className="bg-white dark:bg-zinc-900 p-8 rounded-[40px] border border-zinc-200 dark:border-zinc-800 shadow-xl relative overflow-hidden">
           <div className="relative z-10">
             <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
-              <MapPin size={24} className="text-primary" />
+              <MapPin aria-hidden="true" size={24} className="text-primary" />
               Location Lookup
             </h3>
             
             <div className="space-y-4">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <label htmlFor="address-input" className="sr-only">Enter Address or ZIP Code</label>
+                <Search aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input 
+                  id="address-input"
                   type="text" 
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}

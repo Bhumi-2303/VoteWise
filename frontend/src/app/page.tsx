@@ -8,7 +8,7 @@ import ChatWidget from "@/components/chat/ChatWidget";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen">
+    <main id="main-content" className="relative min-h-screen">
       <Navbar />
       
       <Hero />

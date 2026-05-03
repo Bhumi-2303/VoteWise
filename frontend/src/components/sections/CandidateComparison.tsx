@@ -39,10 +39,11 @@ const CandidateComparison = () => {
         <div className="bg-white dark:bg-zinc-900 p-8 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-sm mb-8">
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="flex-1 w-full space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-primary">Candidate A</label>
+              <label htmlFor="c1-input" className="text-xs font-bold uppercase tracking-wider text-primary">Candidate A name</label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input 
+                  id="c1-input"
                   type="text" 
                   value={c1}
                   onChange={(e) => setC1(e.target.value)}
@@ -53,14 +54,15 @@ const CandidateComparison = () => {
             </div>
 
             <div className="p-3 bg-zinc-100 dark:bg-zinc-800 rounded-full text-zinc-400 hidden md:block">
-              <ArrowRightLeft size={20} />
+              <ArrowRightLeft aria-hidden="true" size={20} />
             </div>
 
             <div className="flex-1 w-full space-y-2">
-              <label className="text-xs font-bold uppercase tracking-wider text-primary">Candidate B</label>
+              <label htmlFor="c2-input" className="text-xs font-bold uppercase tracking-wider text-primary">Candidate B name</label>
               <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
+                <User aria-hidden="true" className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400" size={18} />
                 <input 
+                  id="c2-input"
                   type="text" 
                   value={c2}
                   onChange={(e) => setC2(e.target.value)}
@@ -80,7 +82,7 @@ const CandidateComparison = () => {
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             ) : (
               <>
-                <Search size={20} />
+                <Search aria-hidden="true" size={20} />
                 Generate Neutral Comparison
               </>
             )}
@@ -112,7 +114,7 @@ const CandidateComparison = () => {
               ))}
               
               <div className="p-6 bg-primary/5 border border-primary/20 rounded-3xl flex gap-4">
-                <Info className="text-primary shrink-0" size={24} />
+                <Info aria-hidden="true" className="text-primary shrink-0" size={24} />
                 <div>
                   <h4 className="font-bold text-primary mb-1">AI Trust Indicator</h4>
                   <p className="text-xs text-text-secondary dark:text-zinc-400">

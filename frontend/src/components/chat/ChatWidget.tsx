@@ -57,6 +57,7 @@ const ChatWidget = () => {
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 bg-primary text-white rounded-full shadow-xl flex items-center justify-center transition-shadow hover:shadow-primary/30"
         aria-expanded={isOpen}
+        aria-label={isOpen ? "Close chat" : "Open chat"}
       >
         {isOpen ? <X size={28} /> : <MessageSquare size={28} />}
       </motion.button>
@@ -69,6 +70,9 @@ const ChatWidget = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="absolute bottom-20 right-0 w-[400px] max-w-[calc(100vw-2rem)] h-[600px] max-h-[80vh] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 flex flex-col overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label="VoteWise AI Chat Assistant"
           >
             {/* Header */}
             <div className="p-4 bg-primary text-white flex items-center justify-between">
@@ -97,6 +101,8 @@ const ChatWidget = () => {
             <div 
               ref={scrollRef}
               className="flex-1 overflow-y-auto p-4 space-y-4 bg-zinc-50/50 dark:bg-zinc-900/50"
+              aria-live="polite"
+              aria-atomic="false"
             >
               {messages.map((msg, i) => (
                 <div 
@@ -167,6 +173,7 @@ const ChatWidget = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSend()}
                   placeholder="Ask about candidates, voting..."
+                  aria-label="Type your civic question here"
                   className="w-full pl-4 pr-12 py-3 bg-zinc-100 dark:bg-zinc-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
                 />
                 <button

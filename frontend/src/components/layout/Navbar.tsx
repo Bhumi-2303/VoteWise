@@ -10,14 +10,28 @@ function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+const translations: Record<string, Record<string, string>> = {
+  en: { features: 'Features', howItWorks: 'How it Works', compare: 'Compare', lookup: 'District Lookup', changeLang: 'Change Language' },
+  hi: { features: 'विशेषताएं', howItWorks: 'यह कैसे काम करता है', compare: 'तुलना', lookup: 'जिला खोज', changeLang: 'भाषा बदलें' },
+  gu: { features: 'વિશેષતાઓ', howItWorks: 'તે કેવી રીતે કામ કરે છે', compare: 'સરખામણી', lookup: 'જિલ્લા શોધ', changeLang: 'ભાષા બદલો' },
+};
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [language, setLanguageState] = useState('en');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
+    
+    // Load language and theme from storage
+    const savedLang = localStorage.getItem('votewise_lang');
+    if (savedLang && translations[savedLang]) {
+      setLanguageState(savedLang);
+    }
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -26,11 +40,18 @@ const Navbar = () => {
     setIsDark(!isDark);
   };
 
+  const setLanguage = (value: string) => {
+    setLanguageState(value);
+    localStorage.setItem('votewise_lang', value);
+  };
+
+  const t = translations[language] || translations.en;
+
   const navLinks = [
-    { name: 'Features', href: '#features' },
-    { name: 'How it Works', href: '#how-it-works' },
-    { name: 'Compare', href: '#compare' },
-    { name: 'District Lookup', href: '#lookup' },
+    { name: t.features, href: '#features' },
+    { name: t.howItWorks, href: '#how-it-works' },
+    { name: t.compare, href: '#compare' },
+    { name: t.lookup, href: '#lookup' },
   ];
 
   return (
@@ -69,20 +90,30 @@ const Navbar = () => {
             className="p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
             aria-label="Toggle Theme"
           >
-            {isDark ? <Sun size={20} /> : <Moon size={20} />}
+            {isDark ? <Sun aria-hidden="true" size={20} /> : <Moon aria-hidden="true" size={20} />}
           </button>
           
-          <button className="hidden md:flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-            <Globe size={16} />
-            <span>EN</span>
-            <ChevronDown size={14} />
-          </button>
+          <div className="hidden md:flex items-center gap-1 text-sm font-medium px-3 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors relative">
+            <Globe aria-hidden="true" size={16} />
+            <select
+              aria-label="Select Language"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="bg-transparent appearance-none outline-none cursor-pointer pr-4 uppercase"
+            >
+              <option value="en" className="dark:bg-zinc-900">EN</option>
+              <option value="hi" className="dark:bg-zinc-900">HI</option>
+              <option value="gu" className="dark:bg-zinc-900">GU</option>
+            </select>
+            <ChevronDown aria-hidden="true" size={14} className="absolute right-3 pointer-events-none" />
+          </div>
 
           <button 
             onClick={() => setIsOpen(!isOpen)}
             className="md:hidden p-2 text-text-primary dark:text-white"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? <X aria-hidden="true" size={24} /> : <Menu aria-hidden="true" size={24} />}
           </button>
         </div>
       </div>
@@ -104,10 +135,23 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="h-px bg-zinc-200 dark:bg-zinc-800 my-4" />
-          <button className="flex items-center gap-3 text-lg font-medium">
-            <Globe size={24} />
-            <span>Change Language</span>
-          </button>
+          <div className="flex items-center gap-3 text-lg font-medium">
+            <Globe aria-hidden="true" size={24} />
+            <label htmlFor="mobile-lang-select" className="sr-only">{t.changeLang}</label>
+            <select
+              id="mobile-lang-select"
+              value={language}
+              onChange={(e) => {
+                setLanguage(e.target.value);
+                setIsOpen(false);
+              }}
+              className="bg-transparent appearance-none outline-none cursor-pointer border-b border-zinc-200 dark:border-zinc-800 pb-1 w-full"
+            >
+              <option value="en" className="dark:bg-zinc-900">English</option>
+              <option value="hi" className="dark:bg-zinc-900">हिंदी (Hindi)</option>
+              <option value="gu" className="dark:bg-zinc-900">ગુજરાતી (Gujarati)</option>
+            </select>
+          </div>
         </div>
       </div>
     </nav>
