@@ -15,23 +15,25 @@ export interface Message {
 
 export interface ChatResponse {
   reply: string;
+  status?: string;
   context?: any;
 }
 
 export interface ComparisonItem {
   category: string;
-  v1: string;
+  v1: string; // The UI expects v1/v2, but backend gives c1/c2
   v2: string;
 }
 
 export interface ComparisonResponse {
   candidates: string[];
   comparison: ComparisonItem[];
+  summary?: string;
 }
 
 export interface Representative {
   name: string;
-  office: string;
+  office: string; // The UI expects office, backend gives title
   party: string;
 }
 
@@ -44,6 +46,7 @@ export interface DistrictResponse {
   address: string;
   representatives: Representative[];
   elections: Election[];
+  polling_locations?: any[];
 }
 
 export interface ApiError {
@@ -54,7 +57,9 @@ export interface ApiError {
 // --- Internal Helper ---
 
 async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const url = `${API_BASE_URL}${path}`;
+  // Strip trailing slashes to avoid issues, then append properly if needed.
+  // The backend uses /api/v1/chat/, /api/v1/compare/, /api/v1/lookup/?address=...
+  const url = `${API_BASE_URL.replace(/\/$/, '')}${path}`;
   
   const defaultHeaders = {
     'Content-Type': 'application/json',
@@ -76,66 +81,114 @@ async function apiRequest<T>(path: string, options: RequestInit = {}): Promise<T
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw {
-        message: errorData.message || `API Error: ${response.statusText}`,
-        status: response.status
-      } as ApiError;
+      let errorMessage = `API Error: ${response.statusText || response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData.message) errorMessage = errorData.message;
+        if (errorData.detail) errorMessage = Array.isArray(errorData.detail) ? errorData.detail[0].msg : errorData.detail;
+      } catch (e) {
+        // Not a JSON error, keep default
+      }
+      throw { message: errorMessage, status: response.status } as ApiError;
     }
 
     return await response.json();
   } catch (error: any) {
     clearTimeout(timeoutId);
     if (error.name === 'AbortError') {
-      throw { message: "Request timed out. Please try again.", status: 408 };
+      throw { message: "Request timed out. Please check your connection and try again.", status: 408 };
     }
-    if (error.message) throw error;
-    throw { message: "Network error. Please check your connection.", status: 0 };
+    // If it's a TypeError related to fetch, it's likely offline or CORS
+    if (error instanceof TypeError) {
+       throw { message: "Network error. Please check if you are offline or if the backend is reachable.", status: 0 };
+    }
+    if (error.status !== undefined) throw error;
+    throw { message: error.message || "Unknown error occurred.", status: 0 };
   }
 }
 
 // --- Public API Functions ---
 
 /**
+ * Health Check: Verifies frontend-to-backend connectivity.
+ */
+export async function checkHealth(): Promise<{ status: string }> {
+  return apiRequest<{ status: string }>("/health", { method: 'GET' });
+}
+
+/**
  * Sends a chat message history to the AI assistant.
  */
 export async function sendChatMessage(messages: Message[], locale: string = "en"): Promise<ChatResponse> {
+  if (!messages || messages.length === 0) {
+    throw new Error("Messages array cannot be empty.");
+  }
+  
+  // Maps UI 'assistant' -> 'model' if backend expects 'model'
+  const mappedMessages = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : m.role,
+    content: m.content
+  }));
+
+  // Actual backend route is POST /api/v1/chat/
   return apiRequest<ChatResponse>("/api/v1/chat/", {
     method: 'POST',
-    body: JSON.stringify({
-      messages: messages.map(m => ({
-        role: m.role === 'assistant' ? 'model' : m.role,
-        content: m.content
-      })),
-      locale
-    }),
+    body: JSON.stringify({ messages: mappedMessages, locale }),
   });
 }
 
 /**
  * Generates a neutral comparison between two political candidates.
  */
-export async function compareCandidates(c1: string, c2: string, language: string = "English"): Promise<ComparisonResponse> {
-  if (!c1 || !c2) throw new Error("Both candidates are required for comparison.");
+export async function compareCandidates(candidate1: string, candidate2: string, language: string = "English"): Promise<ComparisonResponse> {
+  if (!candidate1?.trim() || !candidate2?.trim()) {
+    throw new Error("Both candidates are required for comparison.");
+  }
   
-  return apiRequest<ComparisonResponse>("/api/v1/compare/", {
+  // Actual backend route is POST /api/v1/compare/
+  const data = await apiRequest<any>("/api/v1/compare/", {
     method: 'POST',
-    body: JSON.stringify({ candidate1: c1, candidate2: c2, language }),
+    body: JSON.stringify({ candidate1, candidate2, language }),
   });
+
+  // Map backend 'c1', 'c2' to frontend 'v1', 'v2'
+  const comparison = data.comparison?.map((item: any) => ({
+    category: item.category,
+    v1: item.c1,
+    v2: item.c2
+  })) || [];
+
+  return {
+    candidates: data.candidates || [candidate1, candidate2],
+    comparison,
+    summary: data.summary
+  };
 }
 
 /**
  * Looks up district and election information for a given address.
  */
 export async function lookupDistrict(address: string): Promise<DistrictResponse> {
-  if (!address.trim()) throw new Error("An address or ZIP code is required.");
-
-  // The user requested a POST to /district in the prompt, but our backend uses /api/v1/lookup/?address=...
-  // I will implement it as requested if I'm sure of the path, 
-  // but looking at previous history, the backend used /api/v1/lookup/.
-  // I'll provide a wrapper that uses the correct backend path but matches the user's requested logic.
+  if (!address?.trim()) {
+    throw new Error("An address is required.");
+  }
   
-  return apiRequest<DistrictResponse>(`/api/v1/lookup/?address=${encodeURIComponent(address)}`, {
-    method: 'GET' // Reverting to GET as confirmed by backend logs earlier, but wrapped in a safe helper
+  // Actual backend route is GET /api/v1/lookup/?address=...
+  const data = await apiRequest<any>(`/api/v1/lookup/?address=${encodeURIComponent(address)}`, {
+    method: 'GET',
   });
+
+  // Map backend title to frontend office
+  const representatives = data.representatives?.map((rep: any) => ({
+    name: rep.name,
+    office: rep.title || rep.office,
+    party: rep.party
+  })) || [];
+
+  return {
+    address: data.address,
+    elections: data.elections || [],
+    representatives,
+    polling_locations: data.polling_locations
+  };
 }
