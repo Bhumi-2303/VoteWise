@@ -10,7 +10,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./backend:/app/backend
+      - .:/app
+    restart: unless-stopped
 
   frontend:
     build:
@@ -20,3 +21,4 @@ services:
       - "3000:8080"
     depends_on:
       - backend
+    restart: unless-stopped
