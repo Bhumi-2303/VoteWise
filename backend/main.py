@@ -24,7 +24,7 @@ def create_app() -> FastAPI:
     )
 
     # Configure CORS safely
-    origins = settings.CORS_ORIGINS
+    origins = settings.CORS_ORIGINS + ["https://votewise-frontend-74clgpdhmq-uc.a.run.app"]
     allow_all = "*" in origins
 
     app.add_middleware(

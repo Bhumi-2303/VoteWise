@@ -285,7 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const API_BASE_URL = window.API_BASE_URL || 
         ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
             ? 'http://localhost:8000' 
-            : 'REPLACE_WITH_YOUR_BACKEND_URL'); // e.g., 'https://votewise-backend-xyz.a.run.app'
+            : 'https://votewise-backend-74clgpdhmq-uc.a.run.app');
             
     const CHAT_API_URL = `${API_BASE_URL}/api/v1/chat/`;
     const VERSION_API_URL = `${API_BASE_URL}/api/v1/version`;
