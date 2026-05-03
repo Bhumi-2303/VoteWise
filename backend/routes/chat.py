@@ -6,6 +6,10 @@ from backend.services.ai import ai_service
 from backend.utils.logger import app_logger
 from backend.main import limiter
 
+import logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 class ChatRequest(BaseModel):
@@ -20,6 +24,7 @@ class ChatResponse(BaseModel):
 @router.post("/", response_model=ChatResponse)
 @limiter.limit("20/minute")
 async def chat_endpoint(request: Request, body: ChatRequest):
+    logger.info(f"Chat request received - locale: {body.locale}, msg_length: {len(body.message)}")
     """
     Handle multi-turn chat messages with robust error handling and fallback support.
     """
