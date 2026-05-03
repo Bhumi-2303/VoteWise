@@ -133,7 +133,11 @@ export async function sendChatMessage(messages: Message[], locale: string = "en"
   // Actual backend route is POST /api/v1/chat/
   return apiRequest<ChatResponse>("/api/v1/chat/", {
     method: 'POST',
-    body: JSON.stringify({ messages: mappedMessages, locale }),
+    body: JSON.stringify({ 
+      message: mappedMessages[mappedMessages.length - 1]?.content || "Hello", 
+      messages: mappedMessages, 
+      locale 
+    }),
   });
 }
 

@@ -11,3 +11,4 @@ pydantic-settings
 gunicorn
 pytest
 pytest-asyncio
+slowapi

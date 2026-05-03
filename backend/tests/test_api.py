@@ -11,6 +11,7 @@ def test_health_check():
 
 def test_chat_valid_message():
     payload = {
+        "message": "What is voting?",
         "messages": [{"role": "user", "content": "What is voting?"}],
         "locale": "en"
     }

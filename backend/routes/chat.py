@@ -1,42 +1,42 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, status, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from backend.services.ai import ai_service
 from backend.utils.logger import app_logger
+from backend.main import limiter
 
 router = APIRouter()
 
-class ChatMessage(BaseModel):
-    role: str = Field(..., description="The role of the message sender (user or model)")
-    content: str = Field(..., description="The text content of the message")
-
 class ChatRequest(BaseModel):
-    messages: List[ChatMessage] = Field(..., description="The full conversation history")
-    locale: str = Field(default="en", description="The locale for language matching")
+    message: str = Field(..., min_length=1, max_length=2000)
+    messages: list = Field(default=[], max_length=50)
+    locale: str = Field(default="en", max_length=10)
 
 class ChatResponse(BaseModel):
     reply: str
     status: str = "success"
 
 @router.post("/", response_model=ChatResponse)
-async def chat_endpoint(request: ChatRequest):
+@limiter.limit("20/minute")
+async def chat_endpoint(request: Request, body: ChatRequest):
     """
     Handle multi-turn chat messages with robust error handling and fallback support.
     """
     try:
         system_instruction = (
             f"You are VoteWise AI, a civic education assistant. "
-            f"Always respond in the language matching this locale: {request.locale}. "
+            f"Always respond in the language matching this locale: {body.locale}. "
             f"Be neutral, factual, and cite official sources."
         )
 
         # Use the hardened AI service
         # It handles its own internal fallbacks for Gemini failures
+        # body.messages is now a generic list, so pass it directly
         reply = await ai_service.get_chat_response(
-            messages=[m.dict() for m in request.messages],
+            messages=body.messages,
             system_instruction=system_instruction,
-            locale=request.locale
+            locale=body.locale
         )
         
         return ChatResponse(reply=reply)

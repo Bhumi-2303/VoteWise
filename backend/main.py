@@ -6,6 +6,12 @@ import sys
 import os
 import uvicorn
 
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+
+limiter = Limiter(key_func=get_remote_address)
+
 # Ensure the root directory is in the Python path so absolute imports work
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
@@ -23,17 +29,15 @@ def create_app() -> FastAPI:
         version=settings.VERSION,
     )
 
-    # Configure CORS safely
-    origins = settings.CORS_ORIGINS + ["https://votewise-frontend-74clgpdhmq-uc.a.run.app"]
-    allow_all = "*" in origins
+    app.state.limiter = limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"] if allow_all else origins,
-        allow_credentials=not allow_all, # Browser blocks allow_credentials=True with allow_origins=["*"]
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["X-Process-Time"],
+        allow_origins=["https://votewise-frontend-934331733354.us-central1.run.app"],
+        allow_credentials=True,
+        allow_methods=["GET", "POST"],
+        allow_headers=["Content-Type"]
     )
 
     # Global timing middleware
