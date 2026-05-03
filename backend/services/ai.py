@@ -12,6 +12,36 @@ from backend.core.config import settings
 from backend.utils.logger import app_logger
 from backend.services.fallback_service import get_fallback_response
 
+import httpx
+import re
+
+async def fetch_civic_context(message: str) -> Optional[str]:
+    """Extract zip code and fetch civic data if present to enrich the AI's context."""
+    if not settings.GOOGLE_CIVIC_API_KEY:
+        return None
+        
+    zip_match = re.search(r'\b\d{5}\b', message)
+    if not zip_match:
+        return None
+        
+    zip_code = zip_match.group(0)
+    try:
+        async with httpx.AsyncClient() as client:
+            url = "https://www.googleapis.com/civicinfo/v2/representatives"
+            params = {
+                "address": zip_code,
+                "key": settings.GOOGLE_CIVIC_API_KEY
+            }
+            res = await client.get(url, params=params, timeout=5.0)
+            if res.status_code == 200:
+                data = res.json()
+                officials = [o.get("name") for o in data.get("officials", [])[:5]]
+                if officials:
+                    return f"System Context: The user is asking from location ({zip_code}). Key representatives found: {', '.join(officials)}."
+    except Exception as e:
+        app_logger.warning(f"Failed to fetch civic context: {e}")
+    return None
+
 class AIService:
     """
     Centralized service for AI operations. 
@@ -64,6 +94,13 @@ class AIService:
         try:
             app_logger.info(f"AIService: Requesting Gemini [gemini-2.0-flash] | Locale: {locale}")
             
+            # Enrich system context dynamically if the user provided a zip code
+            if messages:
+                last_msg = messages[-1].get("content", "")
+                civic_context = await fetch_civic_context(last_msg)
+                if civic_context:
+                    system_instruction += f"\n\n{civic_context}"
+
             # Use a timeout to prevent hanging the Cloud Run instance
             response = await asyncio.wait_for(
                 client.aio.models.generate_content(
