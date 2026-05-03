@@ -9,9 +9,9 @@ from backend.main import limiter
 router = APIRouter()
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., min_length=1, max_length=2000)
-    messages: list = Field(default=[], max_length=50)
-    locale: str = Field(default="en", max_length=10)
+    message: str = Field(default="Hello", max_length=2000)
+    messages: list = Field(default_factory=list)
+    locale: str = Field(default="en")
 
 class ChatResponse(BaseModel):
     reply: str
