@@ -46,13 +46,14 @@ steps:
   # Build Frontend
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-frontend'
+    dir: 'frontend'
     args:
       [
         'build',
         '-t',
         'gcr.io/$PROJECT_ID/votewise-frontend:latest',
         '-f',
-        'frontend/Dockerfile',
+        'Dockerfile',
         '.'
       ]
     waitFor: ['deploy-backend']

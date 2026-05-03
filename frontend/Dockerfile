@@ -1,35 +1,38 @@
 # --- Build Stage ---
 FROM node:20-alpine AS builder
 
-WORKDIR /app
-
-# Install build dependencies for native modules if needed
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
 RUN apk add --no-cache libc6-compat
 
+WORKDIR /app
+
+# Disable telemetry during build
+ENV NEXT_TELEMETRY_DISABLED=1
+
 # Copy package files for better caching
-COPY frontend/package*.json ./
-RUN npm install --frozen-lockfile || npm install
+# Note: Context is assumed to be the 'frontend' directory
+COPY package*.json ./
+RUN npm ci || npm install
 
 # Copy source and build
-COPY frontend/ .
+COPY . .
 RUN npm run build
 
 # --- Final Stage ---
-FROM node:20-alpine
+FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Production environment
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=8080
+ENV HOSTNAME="0.0.0.0"
 
 # Non-root user for security
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy necessary files from builder
-# Note: In standalone mode, Next.js copies everything needed to .next/standalone
-# But we'll stick to a more standard production copy for now
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -43,5 +46,4 @@ USER nextjs
 EXPOSE 8080
 
 # Start the Next.js server on port 8080
-# Explicitly binding to 0.0.0.0
 CMD ["npm", "start", "--", "-p", "8080"]
